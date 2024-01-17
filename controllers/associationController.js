@@ -72,7 +72,7 @@ exports.getAllAssociations = async (req, res) => {
 
     // Transform data before sending the response
     const transformedAssociations = associations.map(association => ({
-      association: {
+      
         _id: association._id,
         name: association.name,
         type: association.type,
@@ -81,10 +81,13 @@ exports.getAllAssociations = async (req, res) => {
         password: association.password,
         image: association.image,
         __v: association.__v
-      }
+      
     }));
 
-    res.send(transformedAssociations);
+    // Create an object with the "association" property
+    const responseData = { association: transformedAssociations };
+
+    res.send(responseData);
   } catch (error) {
     res.status(500).send(error.message);
   }
