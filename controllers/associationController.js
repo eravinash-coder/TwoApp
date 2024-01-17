@@ -72,7 +72,7 @@ exports.getAllAssociations = async (req, res) => {
 
     // Transform data before sending the response
     const transformedAssociations = associations.map(association => ({
-      name: association.name,
+      name: association.shortName,
       id: association._id.toString(), // Assuming you want the id as a string
       atype: association.type,
       logo : association.image

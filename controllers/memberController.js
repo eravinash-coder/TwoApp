@@ -23,14 +23,18 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { associationId, email, password } = req.body;
+   
     const member = await Member.findOne({ email });
+    if (associationId && String(member.associationId) !== associationId) {
+      throw new Error('Member does not belong to the specified association');
+    }
 
     if (!member || !(await bcrypt.compare(password, member.password))) {
       throw new Error('Invalid login credentials');
     }
 
-    const token = jwt.sign({ memberId: member._id }, 'your-secret-key');
+    const token = jwt.sign({ memberId: member._id }, 'userNewsApp');
     res.send({ token });
   } catch (error) {
     res.status(401).send(error.message);
