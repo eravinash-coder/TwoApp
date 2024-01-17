@@ -10,13 +10,14 @@ const Upload = require("../helpers/upload");
 
 exports.register = asyncHandler(async (req, res) => {
   // const imgUrl = await uploadImage(req.files)
-  const {   name, shortName,email ,password } = req.body;
+  const {   name,type, shortName,email ,password } = req.body;
   // console.log("req.body", req.body);
   // console.log("req.files.images", req.files.image);
   try {
     const upload = await Upload.uploadFile(req.file.path);
     var association = new Association({
       name, 
+      type,
       shortName,
       email ,
       password ,
@@ -68,7 +69,22 @@ exports.login = async (req, res) => {
 exports.getAllAssociations = async (req, res) => {
   try {
     const associations = await Association.find();
-    res.send(associations);
+
+    // Transform data before sending the response
+    const transformedAssociations = associations.map(association => ({
+      association: {
+        _id: association._id,
+        name: association.name,
+        type: association.type,
+        shortName: association.shortName,
+        email: association.email,
+        password: association.password,
+        image: association.image,
+        __v: association.__v
+      }
+    }));
+
+    res.send(transformedAssociations);
   } catch (error) {
     res.status(500).send(error.message);
   }
