@@ -72,22 +72,16 @@ exports.getAllAssociations = async (req, res) => {
 
     // Transform data before sending the response
     const transformedAssociations = associations.map(association => ({
-      
-        _id: association._id,
-        name: association.name,
-        type: association.type,
-        shortName: association.shortName,
-        email: association.email,
-        password: association.password,
-        image: association.image,
-        __v: association.__v
-      
+      name: association.name,
+      id: association._id.toString(), // Assuming you want the id as a string
+      atype: association.type,
+      logo : association.image
     }));
 
     // Create an object with the "association" property
     const responseData = { association: transformedAssociations };
 
-    res.send(responseData);
+    res.send([responseData]);
   } catch (error) {
     res.status(500).send(error.message);
   }
