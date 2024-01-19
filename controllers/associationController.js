@@ -3,69 +3,73 @@ const asyncHandler = require("express-async-handler");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Upload = require("../helpers/upload");
+const { has } = require('lodash');
 
 
 
 
 
 exports.register = asyncHandler(async (req, res) => {
-  // const imgUrl = await uploadImage(req.files)
-  const {   name,type, shortName,email ,password } = req.body;
-  // console.log("req.body", req.body);
-  // console.log("req.files.images", req.files.image);
+  const { name, type, shortName, email, password } = req.body;
+
+  // Hash the password
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   try {
+    // Upload the file and get the secure URL
     const upload = await Upload.uploadFile(req.file.path);
-    var association = new Association({
-      name, 
+
+    // Create a new Association instance
+    const association = new Association({
+      name,
       type,
       shortName,
-      email ,
-      password ,
+      email,
+      password: hashedPassword,
       image: upload.secure_url,
-      
-      
     });
-    var record = await association.save();
-    res.send({ succes: true, msg: 'Association Uploaded Successfully!', data: record });
 
-  } catch (error) {
-    res.send({ succes: false, msg: error.message });
-  }
+    // Save the association record to the database
+    const record = await association.save();
 
-
-  if (Association) {
     res.status(201).json({
       success: true,
-      msg: "Successfully Added Association",
-      data: Association,
+      msg: 'Association Uploaded Successfully!',
+      data: record,
     });
-  } else {
-    res.status(400);
-    throw new Error("Invalid News data");
-  }
-
-  // console.log(bodyData)
-  if (!req.files) {
-    res.status(400).send("Select an Image.");
-  } else {
+  } catch (error) {
+    res.status(400).json({ success: false, msg: error.message });
   }
 });
 
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // console.log("Login Request Body:", req.body);
+
+    // Find association by email
     const association = await Association.findOne({ email });
 
+    // console.log("Found Association:", association);
+
     if (!association || !(await bcrypt.compare(password, association.password))) {
+      // console.error("Invalid login credentials");
       throw new Error('Invalid login credentials');
     }
 
-    const token = jwt.sign({ associationId: association._id }, '7285692526');
+    // Generate JWT token
+    const token = jwt.sign({ associationId: association._id }, 'userNewsApp');
+
+    
+
     res.send({ token });
   } catch (error) {
+    // console.error("Login Error:", error.message);
     res.status(401).send(error.message);
   }
 };
+
 exports.getAllAssociations = async (req, res) => {
   try {
     const associations = await Association.find();

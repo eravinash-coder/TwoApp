@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const circularController = require('../controllers/circularController');
-const authMiddleware = require('../middleware/authAssoMiddleware');
+const authassoMiddleware = require('../middleware/authAssoMiddleware');
 
-router.post('/', authMiddleware, circularController.postCircular);
-router.get('/:associationId', authMiddleware, circularController.getCirculars);
+router.post('/', authassoMiddleware, circularController.postCircular);
+router.get('/:associationId', authassoMiddleware, circularController.getCirculars);
 
 module.exports = router;

@@ -2,15 +2,16 @@ const jwt = require('jsonwebtoken');
 const Association = require('../models/Association');
 const Member = require('../models/Member');
 
-const authMiddleware = async (req, res, next) => {
-  const token = req.header('Authorization');
+const authAssoMiddleware = async (req, res, next) => {
+  const token = req.headers.authorization.split(' ')[1];
+  console.log(token);
 
   if (!token) {
     return res.status(401).send('Unauthorized');
   }
 
   try {
-    const decoded = jwt.verify(token, 'your-secret-key');
+    const decoded = jwt.verify(token, 'userNewsApp');
 
     // Check if the user is an association
     if (decoded.associationId) {
@@ -36,4 +37,4 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
-module.exports = authMiddleware;
+module.exports = authAssoMiddleware;

@@ -5,8 +5,10 @@ const Association = require('../models/Association');
 exports.postCircular = async (req, res) => {
   try {
     const { associationId, content } = req.body;
-
+     console.log(content)
+     console.log(associationId);
     const associationExists = await Association.findById(associationId);
+    console.log(associationExists);
     if (!associationExists) {
       return res.status(404).send('Association not found');
     }
