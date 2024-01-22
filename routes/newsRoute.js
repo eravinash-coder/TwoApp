@@ -16,11 +16,9 @@ var uploader = multer({
 const {
     addNews, getAllNews, getNewsByUser,getTodayNews, getNewsId, getNewsByCategory, editNews, sliderNews, getRelatedNews, addComment, removeComment
 } = require('../controllers/newsController');
-const newsController = require('../controllers/newsController');
 
 const protect = require('../middleware/authMiddleware.js')
 
-router.post('/upload-file', uploader.single("file"), newsController.uploadFile);
 router.route('/addNews').post(uploader.single("file"),addNews);
 router.route('/getAllNews/:page/:perPage').get(getAllNews);
 router.route('/getAllNews/me/:page/:perPage').get(protect, getNewsByUser);

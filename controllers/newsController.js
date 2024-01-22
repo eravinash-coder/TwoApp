@@ -1,19 +1,13 @@
 const asyncHandler = require("express-async-handler");
 const News = require("../models/newsModel.js");
-const User = require("../models/userModel");
 const Upload = require("../helpers/upload");
-const imageToBase64 = require("image-to-base64");
-const moment = require("moment");
 
 
 // @desc    Add News
 // @route   POST /api/news/addNews
 // @access  Private
 const addNews = asyncHandler(async (req, res) => {
-  // const imgUrl = await uploadImage(req.files)
-  const { title, content, url, author, category,audio,categoryName } = req.body;
-  // console.log("req.body", req.body);
-  // console.log("req.files.images", req.files.image);
+  const { title, content, url, author, category, audio, categoryName } = req.body;
   try {
     const upload = await Upload.uploadFile(req.file.path);
     var news = new News({
@@ -28,46 +22,22 @@ const addNews = asyncHandler(async (req, res) => {
       addedAt: Date.now(),
     });
     var record = await news.save();
-    res.send({ succes: true, msg: 'News Uploaded Successfully!', data: record });
-
-  } catch (error) {
-    res.send({ succes: false, msg: error.message });
-  }
-
-
-  if (news) {
+    
+    // Send success response inside the try block
     res.status(201).json({
       success: true,
       msg: "Successfully Added News",
-      data: news,
+      data: record,
     });
-  } else {
-    res.status(400);
-    throw new Error("Invalid News data");
-  }
-
-  // console.log(bodyData)
-  if (!req.files) {
-    res.status(400).send("Select an Image.");
-  } else {
-  }
-});
-const uploadFile = async (req, res) => {
-
-  try {
-    const upload = await Upload.uploadFile(req.file.path);
-
-    var store = new News({
-      urlToImage: upload.secure_url
-    });
-    var record = await store.save();
-    res.send({ succes: true, msg: 'File Uploaded Successfully!', data: record });
 
   } catch (error) {
-    res.send({ succes: false, msg: error.message });
+    // Send error response inside the catch block
+    res.status(400).json({ success: false, msg: error.message });
   }
 
-}
+  
+});
+
 const getAllNews = asyncHandler(async (req, res) => {
   console.log("page number : " + req.params.page);
   console.log("per page : " + req.params.perPage);
@@ -318,7 +288,6 @@ const getTodayNews = asyncHandler(async (req, res) => {
 
 module.exports = {
   addNews,
-  uploadFile,
   getAllNews,
   getTodayNews,
   getNewsId,

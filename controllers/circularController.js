@@ -1,14 +1,13 @@
 const Circular = require('../models/Circular');
 const Member = require('../models/Member');
 const Association = require('../models/Association');
+const asyncHandler = require("express-async-handler");
+const Upload = require("../helpers/upload");
 
-exports.postCircular = async (req, res) => {
+exports.addCircular = asyncHandler(async (req, res) => {
+  const { title, content, associationId } = req.body;
   try {
-    const { associationId, content } = req.body;
-     console.log(content)
-     console.log(associationId);
     const associationExists = await Association.findById(associationId);
-    console.log(associationExists);
     if (!associationExists) {
       return res.status(404).send('Association not found');
     }
@@ -21,14 +20,30 @@ exports.postCircular = async (req, res) => {
     if (!isAssociation) {
       return res.status(403).send('Unauthorized');
     }
+    const upload = await Upload.uploadFile(req.file.path);
+    var circular = new Circular({
+      associationId,
+      title,
+      content,
+      urlToImage: upload.secure_url,
+      addedAt: Date.now(),
+    });
+    var record = await circular.save();
 
-    const circular = new Circular({ associationId, content });
-    await circular.save();
-    res.status(201).send('Circular posted successfully');
+    // Send success response inside the try block
+    res.status(201).json({
+      success: true,
+      msg: "Successfully Added News",
+      data: record,
+    });
+
   } catch (error) {
-    res.status(500).send(error.message);
+    // Send error response inside the catch block
+    res.status(400).json({ success: false, msg: error.message });
   }
-};
+
+
+});
 
 exports.getCirculars = async (req, res) => {
   try {
@@ -49,7 +64,18 @@ exports.getCirculars = async (req, res) => {
     }
 
     const circulars = await Circular.find({ associationId });
-    res.send(circulars);
+    const transformedCirculars = circulars.map(circular => ({
+      id: circular._id.toString(),  // Assuming you want the id as a string
+      title: circular.title,
+      content: circular.content,
+      image: circular.urlToImage,
+      date: circular.addedAt
+    }));
+
+    // Create an object with the "association" property
+    const responseData = { circular: transformedCirculars };
+
+    res.send([responseData]);
   } catch (error) {
     res.status(500).send(error.message);
   }
