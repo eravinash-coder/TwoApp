@@ -11,6 +11,7 @@ const categoryRoutes = require('./routes/categoryRoute');
 const associationRoutes = require('./routes/associationRoutes');
 const memberRoutes = require('./routes/memberRoutes');
 const circularRoutes = require('./routes/circularRoutes');
+const updateRoutes = require('./routes/updateRoutes');
 
 
 const morgan = require('morgan');
@@ -40,6 +41,7 @@ app.use('/api/category', categoryRoutes);
 app.use('/api/associations', associationRoutes);
 app.use('/api/members', memberRoutes);
 app.use('/api/circulars', circularRoutes);
+app.use('/api/updates', updateRoutes);
 
 app.get('*', function(req, res){
   res.status(404).json({
