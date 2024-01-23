@@ -12,6 +12,7 @@ const associationRoutes = require('./routes/associationRoutes');
 const memberRoutes = require('./routes/memberRoutes');
 const circularRoutes = require('./routes/circularRoutes');
 const updateRoutes = require('./routes/updateRoutes');
+const hotelRoutes = require('./routes/hotelRoutes');
 
 
 const morgan = require('morgan');
@@ -42,6 +43,7 @@ app.use('/api/associations', associationRoutes);
 app.use('/api/members', memberRoutes);
 app.use('/api/circulars', circularRoutes);
 app.use('/api/updates', updateRoutes);
+app.use('/api/hotel', hotelRoutes);
 
 app.get('*', function(req, res){
   res.status(404).json({
@@ -56,7 +58,3 @@ app.listen(
     `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.red,
   ),
 );
-
-
-
-// hosted server https://news-app-native.herokuapp.com/
