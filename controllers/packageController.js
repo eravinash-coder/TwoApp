@@ -1,10 +1,10 @@
-const Hotel = require('../models/hotel');
+const Package = require('../models/package');
 const Member = require('../models/Member');
 const Association = require('../models/Association');
 const asyncHandler = require("express-async-handler");
 
 
-exports.addHotel = asyncHandler(async (req, res) => {
+exports.addPackage = asyncHandler(async (req, res) => {
     const {
         associationId,
         dealNane,
@@ -38,7 +38,7 @@ exports.addHotel = asyncHandler(async (req, res) => {
             return res.status(403).send('Unauthorized');
         }
        
-        var hotel = new Hotel({
+        var package = new Package({
             associationId,
             memberId:req.user.memberId,
             dealNane,
@@ -58,12 +58,12 @@ exports.addHotel = asyncHandler(async (req, res) => {
             ContactEmail,
             addedAt: Date.now(),
         });
-        var record = await hotel.save();
+        var record = await package.save();
 
         // Send success response inside the try block
         res.status(201).json({
             success: true,
-            msg: "Successfully Added Hotel",
+            msg: "Successfully Added Package",
             data: record,
         });
 

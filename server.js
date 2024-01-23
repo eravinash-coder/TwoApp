@@ -13,6 +13,7 @@ const memberRoutes = require('./routes/memberRoutes');
 const circularRoutes = require('./routes/circularRoutes');
 const updateRoutes = require('./routes/updateRoutes');
 const hotelRoutes = require('./routes/hotelRoutes');
+const packageRoutes = require('./routes/packageeRoutes');
 
 
 const morgan = require('morgan');
@@ -44,6 +45,7 @@ app.use('/api/members', memberRoutes);
 app.use('/api/circulars', circularRoutes);
 app.use('/api/updates', updateRoutes);
 app.use('/api/hotel', hotelRoutes);
+app.use('/api/package', packageRoutes);
 
 app.get('*', function(req, res){
   res.status(404).json({
