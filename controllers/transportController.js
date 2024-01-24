@@ -100,3 +100,35 @@ exports.getTransport = async (req, res) => {
         res.status(500).send(error.message);
     }
 };
+
+exports.getMyTransports = async (req, res) => {
+    try {
+        
+         const memberId = req.user.memberId;
+
+         const memberExists = await Member.findById(memberId);
+         if (!memberExists) {
+             return res.status(404).send('Member not found');
+         }
+
+        // Authentication middleware will verify if the user is a member of the association
+        // This check is simplified, and you might want to use a proper middleware
+        // Check authMiddleware.js for the actual middleware
+         const isMember = req.user && req.user.role === 'member';
+
+         if (!isMember) {
+             return res.status(403).send('Unauthorized');
+        }
+       
+        
+        const transport = await Transport.find({ memberId });
+
+
+        // Create an object with the "association" property
+        const responseData = { transport };
+
+        res.send([responseData]);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};

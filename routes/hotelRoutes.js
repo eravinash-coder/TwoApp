@@ -7,5 +7,6 @@ const authassoMiddleware = require('../middleware/authAssoMiddleware');
 
 router.post('/addHotel', authassoMiddleware,  hotelController.addHotel);
 router.get('/GetHotels/:associationId', authassoMiddleware,  hotelController.getHotel);
+router.get('/myhotels', authassoMiddleware, hotelController.getMyHotels);
 
 module.exports = router;

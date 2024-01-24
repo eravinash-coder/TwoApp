@@ -20,7 +20,7 @@ const authAssoMiddleware = async (req, res, next) => {
       if (!association) {
         return res.status(401).send('Unauthorized');
       }
-      req.user = { role: 'association', associationId:decoded.associationId};
+      req.user = { role: 'association', associationId: decoded.associationId};
     }
 
     // Check if the user is a member
