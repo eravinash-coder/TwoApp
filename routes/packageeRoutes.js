@@ -6,5 +6,6 @@ const authassoMiddleware = require('../middleware/authAssoMiddleware');
 
 
 router.post('/addPackage', authassoMiddleware,  packageController.addPackage);
+router.get('/Getpackages/:associationId', authassoMiddleware,  packageController.getPackages);
 
 module.exports = router;
