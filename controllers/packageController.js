@@ -37,10 +37,10 @@ exports.addPackage = asyncHandler(async (req, res) => {
         if (!isAssociation) {
             return res.status(403).send('Unauthorized');
         }
-       
+
         var package = new Package({
             associationId,
-            memberId:req.user.memberId,
+            memberId: req.user.memberId,
             dealNane,
             duration,
             dealType,
@@ -78,30 +78,30 @@ exports.addPackage = asyncHandler(async (req, res) => {
 
 exports.getPackages = async (req, res) => {
     try {
-      const associationId = req.params.associationId;
-  
-      const associationExists = await Association.findById(associationId);
-      if (!associationExists) {
-        return res.status(404).send('Association not found');
-      }
-  
-      // Authentication middleware will verify if the user is a member of the association
-      // This check is simplified, and you might want to use a proper middleware
-      // Check authMiddleware.js for the actual middleware
-      const isMember = req.user && req.user.role === 'member';
-  
-      if (!isMember) {
-        return res.status(403).send('Unauthorized');
-      }
-  
-      const Packages = await Package.find({ associationId });
-      
-  
-      // Create an object with the "association" property
-      const responseData = { Packages };
-  
-      res.send([responseData]);
+        const associationId = req.params.associationId;
+
+        const associationExists = await Association.findById(associationId);
+        if (!associationExists) {
+            return res.status(404).send('Association not found');
+        }
+
+        // Authentication middleware will verify if the user is a member of the association
+        // This check is simplified, and you might want to use a proper middleware
+        // Check authMiddleware.js for the actual middleware
+        const isMember = req.user && req.user.role === 'member';
+
+        if (!isMember) {
+            return res.status(403).send('Unauthorized');
+        }
+
+        const Packages = await Package.find({ associationId });
+
+
+        // Create an object with the "association" property
+        const responseData = { Packages };
+
+        res.send([responseData]);
     } catch (error) {
-      res.status(500).send(error.message);
+        res.status(500).send(error.message);
     }
-  };
+};

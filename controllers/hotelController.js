@@ -7,21 +7,20 @@ const asyncHandler = require("express-async-handler");
 exports.addHotel = asyncHandler(async (req, res) => {
     const {
         associationId,
-        dealNane,
-        duration,
-        dealType,
-        priceForSame,
-        priceForOther,
-        airportTransport,
-        inclusions,
+        dealName,
         hotelCategory,
+        hotelplans,
+        dealType,
+        priceForOther,
+        priceForSame,
         description,
         countryOrState,
+        city,
         destination,
         expire,
         ContactName,
         ContactNumber,
-        ContactEmail
+        ContactEmail,
     } = req.body;
     try {
         const associationExists = await Association.findById(associationId);
@@ -37,20 +36,19 @@ exports.addHotel = asyncHandler(async (req, res) => {
         if (!isAssociation) {
             return res.status(403).send('Unauthorized');
         }
-       
+
         var hotel = new Hotel({
             associationId,
-            memberId:req.user.memberId,
-            dealNane,
-            duration,
-            dealType,
-            priceForSame,
-            priceForOther,
-            airportTransport,
-            inclusions,
+            memberId: req.user.memberId,
+            dealName,
             hotelCategory,
+            hotelplans,
+            dealType,
+            priceForOther,
+            priceForSame,
             description,
             countryOrState,
+            city,
             destination,
             expire,
             ContactName,
@@ -74,3 +72,33 @@ exports.addHotel = asyncHandler(async (req, res) => {
 
 
 });
+
+exports.getHotel = async (req, res) => {
+    try {
+        const associationId = req.params.associationId;
+
+        const associationExists = await Association.findById(associationId);
+        if (!associationExists) {
+            return res.status(404).send('Association not found');
+        }
+
+        // Authentication middleware will verify if the user is a member of the association
+        // This check is simplified, and you might want to use a proper middleware
+        // Check authMiddleware.js for the actual middleware
+        const isMember = req.user && req.user.role === 'member';
+
+        if (!isMember) {
+            return res.status(403).send('Unauthorized');
+        }
+
+        const Hotels = await Hotel.find({ associationId });
+
+
+        // Create an object with the "association" property
+        const responseData = { Hotels };
+
+        res.send([responseData]);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
