@@ -134,3 +134,43 @@ exports.getMyHotels = async (req, res) => {
         res.status(500).send(error.message);
     }
 };
+exports.updateHotel = asyncHandler(async (req, res) => {
+    try {
+        const { hotelId } = req.params;
+        const updatedHotelData = req.body;
+
+        const hotel = await Hotel.findByIdAndUpdate(hotelId, updatedHotelData, { new: true });
+
+        if (!hotel) {
+            return res.status(404).send('Hotel not found');
+        }
+
+        res.status(200).json({
+            success: true,
+            msg: "Successfully updated hotel",
+            data: hotel,
+        });
+    } catch (error) {
+        res.status(400).json({ success: false, msg: error.message });
+    }
+});
+
+exports.deleteHotel = asyncHandler(async (req, res) => {
+    try {
+        const { hotelId } = req.params;
+
+        const hotel = await Hotel.findByIdAndDelete(hotelId);
+
+        if (!hotel) {
+            return res.status(404).send('Hotel not found');
+        }
+
+        res.status(200).json({
+            success: true,
+            msg: "Successfully deleted hotel",
+            data: hotel,
+        });
+    } catch (error) {
+        res.status(400).json({ success: false, msg: error.message });
+    }
+});
