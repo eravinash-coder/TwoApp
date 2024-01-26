@@ -108,24 +108,24 @@ exports.getPackages = async (req, res) => {
 
 exports.getMyPackages = async (req, res) => {
     try {
-        
-         const memberId = req.user.memberId;
 
-         const memberExists = await Member.findById(memberId);
-         if (!memberExists) {
-             return res.status(400).send('Member not found');
-         }
+        const memberId = req.user.memberId;
+
+        const memberExists = await Member.findById(memberId);
+        if (!memberExists) {
+            return res.status(400).send('Member not found');
+        }
 
         // Authentication middleware will verify if the user is a member of the association
         // This check is simplified, and you might want to use a proper middleware
         // Check authMiddleware.js for the actual middleware
-         const isMember = req.user && req.user.role === 'member';
+        const isMember = req.user && req.user.role === 'member';
 
-         if (!isMember) {
-             return res.status(403).send('Unauthorized');
+        if (!isMember) {
+            return res.status(403).send('Unauthorized');
         }
-       
-        
+
+
         const Packages = await Package.find({ memberId });
 
 
@@ -138,12 +138,74 @@ exports.getMyPackages = async (req, res) => {
     }
 };
 
+exports.updatePackage = asyncHandler(async (req, res) => {
+    try {
+        const { PackageId } = req.params;
+
+        // Extract the fields you want to update from req.body
+        const {
+            dealNane,
+            duration,
+            dealType,
+            priceForSame,
+            priceForOther,
+            airportTransport,
+            inclusions,
+            hotelCategory,
+            description,
+            countryOrState,
+            destination,
+            expire,
+            ContactName,
+            ContactNumber,
+            ContactEmail
+        } = req.body;
+
+        // Construct an object with the fields to update (exclude undefined values)
+        const updateFields = {
+            dealNane,
+            duration,
+            dealType,
+            priceForSame,
+            priceForOther,
+            airportTransport,
+            inclusions,
+            hotelCategory,
+            description,
+            countryOrState,
+            destination,
+            expire,
+            ContactName,
+            ContactNumber,
+            ContactEmail
+        };
+
+        // Remove undefined values
+        Object.keys(updateFields).forEach(key => updateFields[key] === undefined && delete updateFields[key]);
+
+        // Perform the update and get the updated hotel
+        const package = await Package.findByIdAndUpdate(PackageId, updateFields, { new: true });
+
+        if (!package) {
+            return res.status(400).send('Package not found');
+        }
+
+        res.status(200).json({
+            success: true,
+            msg: "Successfully updated Package",
+            data: package,
+        });
+    } catch (error) {
+        res.status(400).json({ success: false, msg: error.message });
+    }
+});
+
 
 exports.deletePackage = asyncHandler(async (req, res) => {
     try {
-        const { hotelId } = req.params;
+        const { PackageId } = req.params;
 
-        const package = await Package.findByIdAndDelete(hotelId);
+        const package = await Package.findByIdAndDelete(PackageId);
 
         if (!package) {
             return res.status(400).send('Package not found');
