@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const PackageSchema = new mongoose.Schema({
   associationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Association' },
   memberId: { type: mongoose.Schema.Types.ObjectId, ref: 'Member' },
-  dealNane: String,
+  dealName: String,
   duration: String,
   dealType:String,
   priceForSame:String,

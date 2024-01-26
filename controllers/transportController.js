@@ -7,7 +7,7 @@ const asyncHandler = require("express-async-handler");
 exports.addtransport = asyncHandler(async (req, res) => {
     const {
         associationId,
-        dealNane,
+        dealName,
         vechicleCategory,
         fuelType,
         dailyRent,
@@ -39,7 +39,7 @@ exports.addtransport = asyncHandler(async (req, res) => {
         var transport = new Transport({
             associationId,
             memberId: req.user.memberId,
-            dealNane,
+            dealName,
             vechicleCategory,
             fuelType,
             dailyRent,
@@ -140,7 +140,7 @@ exports.updateTransport = asyncHandler(async (req, res) => {
 
         // Extract the fields you want to update from req.body
         const {
-            dealNane,
+            dealName,
             vechicleCategory,
             fuelType,
             dailyRent,
@@ -157,7 +157,7 @@ exports.updateTransport = asyncHandler(async (req, res) => {
 
         // Construct an object with the fields to update (exclude undefined values)
         const updateFields = {
-            dealNane,
+            dealName,
             vechicleCategory,
             fuelType,
             dailyRent,

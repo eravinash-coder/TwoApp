@@ -7,7 +7,7 @@ const asyncHandler = require("express-async-handler");
 exports.addPackage = asyncHandler(async (req, res) => {
     const {
         associationId,
-        dealNane,
+        dealName,
         duration,
         dealType,
         priceForSame,
@@ -41,7 +41,7 @@ exports.addPackage = asyncHandler(async (req, res) => {
         var package = new Package({
             associationId,
             memberId: req.user.memberId,
-            dealNane,
+            dealName,
             duration,
             dealType,
             priceForSame,
@@ -144,7 +144,7 @@ exports.updatePackage = asyncHandler(async (req, res) => {
 
         // Extract the fields you want to update from req.body
         const {
-            dealNane,
+            dealName,
             duration,
             dealType,
             priceForSame,
@@ -163,7 +163,7 @@ exports.updatePackage = asyncHandler(async (req, res) => {
 
         // Construct an object with the fields to update (exclude undefined values)
         const updateFields = {
-            dealNane,
+            dealName,
             duration,
             dealType,
             priceForSame,

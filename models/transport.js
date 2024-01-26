@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const TransportSchema = new mongoose.Schema({
   associationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Association' },
   memberId: { type: mongoose.Schema.Types.ObjectId, ref: 'Member' },
-  dealNane: String,
+  dealName: String,
   vechicleCategory: String,
   fuelType:String,
   dailyRent:String,
