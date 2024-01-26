@@ -134,15 +134,56 @@ exports.getMyHotels = async (req, res) => {
         res.status(500).send(error.message);
     }
 };
+
+
 exports.updateHotel = asyncHandler(async (req, res) => {
     try {
         const { hotelId } = req.params;
-        const updatedHotelData = req.body;
 
-        const hotel = await Hotel.findByIdAndUpdate(hotelId, updatedHotelData, { new: true });
+        // Extract the fields you want to update from req.body
+        const {
+            dealName,
+            hotelCategory,
+            hotelplans,
+            dealType,
+            priceForOther,
+            priceForSame,
+            description,
+            countryOrState,
+            city,
+            destination,
+            expire,
+            ContactName,
+            ContactNumber,
+            ContactEmail,
+        } = req.body;
+
+        // Construct an object with the fields to update (exclude undefined values)
+        const updateFields = {
+            dealName,
+            hotelCategory,
+            hotelplans,
+            dealType,
+            priceForOther,
+            priceForSame,
+            description,
+            countryOrState,
+            city,
+            destination,
+            expire,
+            ContactName,
+            ContactNumber,
+            ContactEmail,
+        };
+
+        // Remove undefined values
+        Object.keys(updateFields).forEach(key => updateFields[key] === undefined && delete updateFields[key]);
+
+        // Perform the update and get the updated hotel
+        const hotel = await Hotel.findByIdAndUpdate(hotelId, updateFields, { new: true });
 
         if (!hotel) {
-            return res.status(404).send('Hotel not found');
+            return res.status(200).send('Hotel not found');
         }
 
         res.status(200).json({
@@ -154,6 +195,9 @@ exports.updateHotel = asyncHandler(async (req, res) => {
         res.status(400).json({ success: false, msg: error.message });
     }
 });
+
+
+
 
 exports.deleteHotel = asyncHandler(async (req, res) => {
     try {

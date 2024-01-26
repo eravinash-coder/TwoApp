@@ -26,7 +26,7 @@ exports.addPackage = asyncHandler(async (req, res) => {
     try {
         const associationExists = await Association.findById(associationId);
         if (!associationExists) {
-            return res.status(404).send('Association not found');
+            return res.status(400).send('Association not found');
         }
 
         // Authentication middleware will verify if the user is the association
@@ -82,7 +82,7 @@ exports.getPackages = async (req, res) => {
 
         const associationExists = await Association.findById(associationId);
         if (!associationExists) {
-            return res.status(404).send('Association not found');
+            return res.status(400).send('Association not found');
         }
 
         // Authentication middleware will verify if the user is a member of the association
@@ -102,7 +102,7 @@ exports.getPackages = async (req, res) => {
 
         res.send([responseData]);
     } catch (error) {
-        res.status(500).send(error.message);
+        res.status(400).send(error.message);
     }
 };
 
@@ -113,7 +113,7 @@ exports.getMyPackages = async (req, res) => {
 
          const memberExists = await Member.findById(memberId);
          if (!memberExists) {
-             return res.status(404).send('Member not found');
+             return res.status(400).send('Member not found');
          }
 
         // Authentication middleware will verify if the user is a member of the association
@@ -134,6 +134,27 @@ exports.getMyPackages = async (req, res) => {
 
         res.send([responseData]);
     } catch (error) {
-        res.status(500).send(error.message);
+        res.status(400).send(error.message);
     }
 };
+
+
+exports.deletePackage = asyncHandler(async (req, res) => {
+    try {
+        const { hotelId } = req.params;
+
+        const package = await Package.findByIdAndDelete(hotelId);
+
+        if (!package) {
+            return res.status(400).send('Package not found');
+        }
+
+        res.status(200).json({
+            success: true,
+            msg: "Successfully deleted Package",
+            data: package,
+        });
+    } catch (error) {
+        res.status(400).json({ success: false, msg: error.message });
+    }
+});

@@ -132,3 +132,23 @@ exports.getMyTransports = async (req, res) => {
         res.status(500).send(error.message);
     }
 };
+
+exports.deleteTransport = asyncHandler(async (req, res) => {
+    try {
+        const { hotelId } = req.params;
+
+        const transport = await Transport.findByIdAndDelete(hotelId);
+
+        if (!transport) {
+            return res.status(200).send('Transport not found');
+        }
+
+        res.status(200).json({
+            success: true,
+            msg: "Successfully deleted Transport",
+            data: transport,
+        });
+    } catch (error) {
+        res.status(400).json({ success: false, msg: error.message });
+    }
+});
