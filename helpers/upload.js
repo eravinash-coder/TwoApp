@@ -11,11 +11,11 @@ const uploadFile = async(filePath) => {
     try {
         console.log(filePath);
         const result = await cloudinary.uploader.upload(filePath);
-        console.log(result);
+        console.log('Cloudinary Upload Result:', result);
         return result;
     } catch (error) {
-        console.log(error.message);
-
+        
+    
     }
 
 }

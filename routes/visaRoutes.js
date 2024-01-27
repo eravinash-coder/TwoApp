@@ -10,12 +10,10 @@ router.use(express.static(path.resolve(__dirname, 'public')));
 
 const multer = require('multer');
 
-const storage = multer.diskStorage({
-  filename: function (req, file, cb){
-    cb(null, file.originalname)
-  }
+const uploader = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 500000 }
 });
-const uploader = multer({storage:storage});
 
 router.post('/addvisa', uploader.single("file"), visaController.addVisa);
 
