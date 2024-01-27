@@ -25,7 +25,7 @@ exports.addHotel = asyncHandler(async (req, res) => {
     try {
         const associationExists = await Association.findById(associationId);
         if (!associationExists) {
-            return res.status(404).send('Association not found');
+            return res.status(400).send('Association not found');
         }
 
         // Authentication middleware will verify if the user is the association
@@ -79,7 +79,7 @@ exports.getHotel = async (req, res) => {
 
         const associationExists = await Association.findById(associationId);
         if (!associationExists) {
-            return res.status(404).send('Association not found');
+            return res.status(400).send('Association not found');
         }
 
         // Authentication middleware will verify if the user is a member of the association
@@ -110,7 +110,7 @@ exports.getMyHotels = async (req, res) => {
 
          const memberExists = await Member.findById(memberId);
          if (!memberExists) {
-             return res.status(404).send('Member not found');
+             return res.status(400).send('Member not found');
          }
 
         // Authentication middleware will verify if the user is a member of the association
@@ -206,7 +206,7 @@ exports.deleteHotel = asyncHandler(async (req, res) => {
         const hotel = await Hotel.findByIdAndDelete(hotelId);
 
         if (!hotel) {
-            return res.status(404).send('Hotel not found');
+            return res.status(400).send('Hotel not found');
         }
 
         res.status(200).json({
