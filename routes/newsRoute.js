@@ -9,10 +9,12 @@ router.use(express.static(path.resolve(__dirname, 'public')));
 
 const multer = require('multer');
 
-var uploader = multer({
-  storage: multer.diskStorage({}),
-  limits: { fileSize: 500000 }
+const storage = multer.diskStorage({
+  filename: function (req, file, cb){
+    cb(null, file.originalname)
+  }
 });
+const uploader = multer({storage:storage});
 const {
     addNews, getAllNews, getNewsByUser,getTodayNews, getNewsId, getNewsByCategory, editNews, sliderNews, getRelatedNews, addComment, removeComment
 } = require('../controllers/newsController');
