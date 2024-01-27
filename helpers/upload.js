@@ -14,6 +14,7 @@ const uploadFile = async(filePath) => {
         return result;
     } catch (error) {
         console.log(error.message);
+
     }
 
 }

@@ -60,7 +60,7 @@ exports.addVisa = asyncHandler(async (req, res) => {
     // Send success response inside the try block
     res.status(201).json({
       success: true,
-      msg: "Successfully Added News",
+      msg: "Successfully Added Visa",
       data: record,
     });
 
