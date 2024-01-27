@@ -1,25 +1,48 @@
 const cloudinary = require("cloudinary").v2;
-          
-cloudinary.config({ 
+const multer = require('multer');
+cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET
+  api_secret: process.env.API_SECRET,
 });
 
-const uploadFile = async(filePath) => {
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+const myUploadMiddleware = upload.single("file");
 
-    try {
-        console.log(filePath);
-        const result = await cloudinary.uploader.upload(filePath);
-        console.log('Cloudinary Upload Result:', result);
-        return result;
-    } catch (error) {
-        
-    
-    }
-
+async function handleUpload(file) {
+  const res = await cloudinary.uploader.upload(file, {
+    resource_type: "auto",
+  });
+  return res;
 }
 
-module.exports = {
-    uploadFile
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
 }
+
+
+const handler = async (req, res) => {
+  try {
+    await runMiddleware(req, res, myUploadMiddleware);
+    const b64 = Buffer.from(req.file.buffer).toString("base64");
+    let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+    const cldRes = await handleUpload(dataURI);
+    res.json(cldRes);
+  } catch (error) {
+    console.log(error);
+    res.send({
+      message: error.message,
+    });
+  }
+};
+module.exports = handler;
+
+
