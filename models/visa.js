@@ -21,9 +21,10 @@ const visaSchema = new mongoose.Schema({
     country :String,
     
     zipcode :String,
-    
-    dob :String,
-    urlToImage: String
+    images: [{
+        url: String
+        
+      }]
 
 });
 
