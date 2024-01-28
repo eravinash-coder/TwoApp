@@ -1,8 +1,28 @@
 const LaxuryTransport = require("../models/LaxuryTransport");
+const asyncHandler = require("express-async-handler");
 
-exports.AddLaxuryTransport = async (req, res) => {
+exports.AddLaxuryTransport = asyncHandler(async (req, res) => {
+    const {
+            fname,
+
+            lname,
+
+            phone,
+
+            brandOfVehicle,
+
+            numberOfPeople,
+
+            luxury,
+
+            sluxury,
+
+            address
+    } = req.body;
     try {
-        const {
+        
+
+        var laxuryTransport = new LaxuryTransport({
             fname,
 
             lname,
@@ -17,31 +37,21 @@ exports.AddLaxuryTransport = async (req, res) => {
 
             sluxury,
 
-            address 
-        } = req.body;
+            address
+        });
+        var record = await laxuryTransport.save();
 
+        // Send success response inside the try block
+        res.status(201).json({
+            success: true,
+            msg: "Successfully Added",
+            data: record,
+        });
 
-
-
-        const laxuryTransport = new LaxuryTransport({             
-            fname,
-
-            lname,
-
-            phone,
-
-            brandOfVehicle,
-
-            numberOfPeople,
-
-            luxury,
-
-            sluxury,
-
-            address  });
-        await laxuryTransport.save();
-        res.status(201).send(' Uploded successfully');
     } catch (error) {
-        res.status(500).send(error.message);
+        // Send error response inside the catch block
+        res.status(400).json({ success: false, msg: error.message });
     }
-};
+
+
+});
