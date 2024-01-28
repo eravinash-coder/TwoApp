@@ -35,7 +35,7 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign({ memberId: member._id }, 'userNewsApp');
-    res.send({ token });
+    res.send({ token ,member});
   } catch (error) {
     res.status(401).send(error.message);
   }
