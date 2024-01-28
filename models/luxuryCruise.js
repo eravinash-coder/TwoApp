@@ -3,19 +3,19 @@ const mongoose = require('mongoose');
 const luxuryCruiseSchema = new mongoose.Schema({
 
 
-    fname,
+    fname:String,
 
-    lname,
+    lname:String,
 
-    phone,
+    phone:String,
 
-    email,
+    email:String,
 
-    destination,
+    destination:String,
 
-    departurePort,
+    departurePort:String,
 
-    LenghtOfTour
+    LenghtOfTour:String
 });
 
 module.exports = mongoose.model('luxuryCruise', luxuryCruiseSchema);
