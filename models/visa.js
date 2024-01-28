@@ -1,30 +1,66 @@
 const mongoose = require('mongoose');
 
 const visaSchema = new mongoose.Schema({
+  countryName:String,
+  fname: String,
+
+  lname: String,
+
+  email: String,
+
+  phone: String,
+
+  visaType: String,
+
+  address: String,
+
+  city: String,
+
+  state: String,
+
+  country: String,
+
+  zipcode: String,
+  images: [{
+    url: String
+
+  }],
+  passport:[{
+    url: String
+
+  }],
+  bankstatement:[{
+    url: String
     
-    fname :String,
+  }],
+  hotelbooking:[{
+    url: String
     
-    lname :String,
+  }],
+  flightbook:[{
+    url: String
     
-    email :String,
+  }],
+  travelInsurance:[{
+    url: String
     
-    phone :String,
+  }],
+  ITR:[{
+    url: String
     
-    visaType :String,
+  }],
+  iternnary:[{
+    url: String
     
-    address :String,
+  }],
+  marriage:[{
+    url: String
     
-    city :String,
+  }],
+  invitationletter:[{
+    url: String
     
-    state :String,
-    
-    country :String,
-    
-    zipcode :String,
-    images: [{
-        url: String
-        
-      }]
+  }]
 
 });
 
