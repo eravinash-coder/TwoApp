@@ -19,6 +19,7 @@ const visaRoutes = require('./routes/visaRoutes');
 const laxuryTransportRoutes = require('./routes/laxuryTransportRoutes');
 const luxuryCruiseRoutes = require('./routes/luxuryCruiseRoutes');
 const charterFlight = require('./routes/charterFlightRoutes');
+const laxuryHotelRoutes = require('./routes/laxuryHotelRoutes');
 
 const morgan = require('morgan');
 
@@ -55,6 +56,7 @@ app.use('/api/visa', visaRoutes);
 app.use('/api/laxuryTransport', laxuryTransportRoutes);
 app.use('/api/luxuryCruise', luxuryCruiseRoutes);
 app.use('/api/charterFlight', charterFlight);
+app.use('/api/LaxuryHotel', laxuryHotelRoutes);
 
 app.get('*', function(req, res){
   res.status(404).json({

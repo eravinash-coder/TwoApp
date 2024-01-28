@@ -11,7 +11,7 @@ async function handleUpload(file) {
     resource_type: "auto",
   });
   
-  return res;
+  return res.secure_url;
   
 }
 
