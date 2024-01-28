@@ -76,60 +76,76 @@ exports.addVisa = asyncHandler(async (req, res) => {
       );
     }
     if (req.files && req.files['bankstatement_documentUrl']) {
-      bankstatementObjects = await Promise.all(req.bankstatement_documentUrl.map(async (file) => {
-        const b64 = Buffer.from(file.buffer).toString('base64');
-        const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
-        return handleUpload(dataURI);
-      }));
+      passportObjects = await Promise.all(
+        req.files['bankstatement_documentUrl'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
     }
     if (req.files && req.files['hotelbooking_documentUrl']) {
-       hotelbookingObjects = await Promise.all(req.hotelbooking_documentUrl.map(async (file) => {
-        const b64 = Buffer.from(file.buffer).toString('base64');
-        const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
-        return handleUpload(dataURI);
-      }));
+      passportObjects = await Promise.all(
+        req.files['hotelbooking_documentUrl'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
     }
     if (req.files && req.files['flightbook_documentUrl']) {
-       flightbookObjects = await Promise.all(req.flightbook_documentUrl.map(async (file) => {
-        const b64 = Buffer.from(file.buffer).toString('base64');
-        const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
-        return handleUpload(dataURI);
-      }));
+      passportObjects = await Promise.all(
+        req.files['flightbook_documentUrl'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
     }
     if (req.files && req.files['travelInsurance_documentUrl']) {
-       travelInsuranceObjects = await Promise.all(req.travelInsurance_documentUrl.map(async (file) => {
-        const b64 = Buffer.from(file.buffer).toString('base64');
-        const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
-        return handleUpload(dataURI);
-      }));
+      passportObjects = await Promise.all(
+        req.files['travelInsurance_documentUrl'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
     }
     if (req.files && req.files['ITR_documentUrl']) {
-       ITRObjects = await Promise.all(req.ITR_documentUrl.map(async (file) => {
-        const b64 = Buffer.from(file.buffer).toString('base64');
-        const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
-        return handleUpload(dataURI);
-      }));
+      passportObjects = await Promise.all(
+        req.files['ITR_documentUrl'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
     }
     if (req.files && req.files['iternnary_documentUrl']) {
-       iternnaryObjects = await Promise.all(req.iternnary_documentUrl.map(async (file) => {
-        const b64 = Buffer.from(file.buffer).toString('base64');
-        const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
-        return handleUpload(dataURI);
-      }));
+      passportObjects = await Promise.all(
+        req.files['iternnary_documentUrl'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
     }
     if (req.files && req.files['marriage_certificate']) {
-       marriageObjects = await Promise.all(req.marriage_certificate.map(async (file) => {
-        const b64 = Buffer.from(file.buffer).toString('base64');
-        const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
-        return handleUpload(dataURI);
-      }));
+      passportObjects = await Promise.all(
+        req.files['marriage_certificate'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
     }
     if (req.files && req.files['invitationletter_documentUrl']) {
-       invitationletterObjects = await Promise.all(req.invitationletter_documentUrl.map(async (file) => {
-        const b64 = Buffer.from(file.buffer).toString('base64');
-        const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
-        return handleUpload(dataURI);
-      }));
+      passportObjects = await Promise.all(
+        req.files['invitationletter_documentUrl'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
     }
 
     const visa = new Visa({
