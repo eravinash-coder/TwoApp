@@ -10,5 +10,6 @@ router.get('/GetHotels/:associationId', authassoMiddleware,  hotelController.get
 router.get('/myhotels', authassoMiddleware, hotelController.getMyHotels);
 router.put('/updateHotel/:hotelId', authassoMiddleware, hotelController.updateHotel);
 router.delete('/deleteHotel/:hotelId', authassoMiddleware, hotelController.deleteHotel);
+router.post('/AddorRemovefavorites', authassoMiddleware, hotelController.AddorRemovefavorites);
 
 module.exports = router;

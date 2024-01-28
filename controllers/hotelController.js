@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Hotel = require('../models/hotel');
 const Member = require('../models/Member');
 const Association = require('../models/Association');
@@ -105,24 +106,24 @@ exports.getHotel = async (req, res) => {
 
 exports.getMyHotels = async (req, res) => {
     try {
-        
-         const memberId = req.user.memberId;
 
-         const memberExists = await Member.findById(memberId);
-         if (!memberExists) {
-             return res.status(400).send('Member not found');
-         }
+        const memberId = req.user.memberId;
+
+        const memberExists = await Member.findById(memberId);
+        if (!memberExists) {
+            return res.status(400).send('Member not found');
+        }
 
         // Authentication middleware will verify if the user is a member of the association
         // This check is simplified, and you might want to use a proper middleware
         // Check authMiddleware.js for the actual middleware
-         const isMember = req.user && req.user.role === 'member';
+        const isMember = req.user && req.user.role === 'member';
 
-         if (!isMember) {
-             return res.status(403).send('Unauthorized');
+        if (!isMember) {
+            return res.status(403).send('Unauthorized');
         }
-       
-        
+
+
         const hotel = await Hotel.find({ memberId });
 
 
@@ -216,5 +217,41 @@ exports.deleteHotel = asyncHandler(async (req, res) => {
         });
     } catch (error) {
         res.status(400).json({ success: false, msg: error.message });
+    }
+});
+
+exports.AddorRemovefavorites = asyncHandler(async (req, res) => {
+    const memberId = req.user.memberId;
+    const id = req.body.hotelId;
+  
+    try {
+      const member = await Member.findById(memberId);
+  
+      // Check if member or favorites is null or undefined
+      if (!member || !member.favoritesHotel) {
+        return res.status(400).json({ success: false, msg: 'Member or favorites not found' });
+      }
+  
+      const alreadyAdded = member.favoritesHotel.find((favId) => favId && favId.toString() === id);
+  
+      if (alreadyAdded) {
+        const updatedMember = await Member.findByIdAndUpdate(memberId, {
+          $pull: { favoritesHotel: id },
+        }, {
+          new: true,
+        });
+  
+        res.status(200).send({ message: 'Remove favorites successfully', member: updatedMember });
+      } else {
+        const updatedMember = await Member.findByIdAndUpdate(memberId, {
+          $push: { favoritesHotel: id },
+        }, {
+          new: true,
+        });
+  
+        res.status(200).send({ message: 'Added favorites successfully', member: updatedMember });
+      }
+    } catch (error) {
+      res.status(400).json({ success: false, msg: error.message });
     }
 });
