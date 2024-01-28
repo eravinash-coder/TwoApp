@@ -255,3 +255,24 @@ exports.AddorRemovefavorites = asyncHandler(async (req, res) => {
       res.status(400).json({ success: false, msg: error.message });
     }
 });
+
+exports.getFavoriteHotels = asyncHandler(async (req, res) => {
+    const memberId = req.user.memberId;
+  
+    try {
+      const member = await Member.findById(memberId);
+  
+      // Check if member or favoritesHotel is null or undefined
+      if (!member || !member.favoritesHotel) {
+        return res.status(400).json({ success: false, msg: 'Member or favorites not found' });
+      }
+  
+      // Assuming Hotel is the model for hotels
+      const favoriteHotels = await Hotel.find({ _id: { $in: member.favoritesHotel } });
+  
+      res.status(200).json({ success: true, favoriteHotels });
+    } catch (error) {
+      res.status(400).json({ success: false, msg: error.message });
+    }
+  });
+  
