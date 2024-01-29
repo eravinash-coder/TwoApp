@@ -108,7 +108,7 @@ exports.getHotel = async (req, res) => {
             modifiedHotels.push(responseData);
         }
 
-        res.send(modifiedHotels);
+        res.send({hotel:modifiedHotels});
     } catch (error) {
         res.status(500).send(error.message);
     }
