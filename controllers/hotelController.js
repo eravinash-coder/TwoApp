@@ -77,7 +77,7 @@ exports.addHotel = asyncHandler(async (req, res) => {
 exports.getHotel = async (req, res) => {
     try {
         const associationId = req.params.associationId;
-
+        const memberId = req.user.memberId;
         const associationExists = await Association.findById(associationId);
         if (!associationExists) {
             return res.status(400).send('Association not found');
@@ -95,10 +95,20 @@ exports.getHotel = async (req, res) => {
         const Hotels = await Hotel.find({ associationId });
 
 
-        // Create an object with the "association" property
-        const responseData = { Hotels };
+        const modifiedHotels = [];
 
-        res.send([responseData]);
+        // Loop through each hotel and check if the member is in its favorites
+        for (const hotel of Hotels) {
+            const isFav = hotel.favorites.includes(memberId);
+            // Create an object with the "hotel" and "isFav" properties
+            const responseData = {
+                hotel,
+                isFav,
+            };
+            modifiedHotels.push(responseData);
+        }
+
+        res.send(modifiedHotels);
     } catch (error) {
         res.status(500).send(error.message);
     }
@@ -226,30 +236,39 @@ exports.AddorRemovefavorites = asyncHandler(async (req, res) => {
   
     try {
       const member = await Member.findById(memberId);
-  
+      const hotel = await Hotel.findById(id);
+      
       // Check if member or favorites is null or undefined
       if (!member || !member.favoritesHotel) {
         return res.status(400).json({ success: false, msg: 'Member or favorites not found' });
       }
   
       const alreadyAdded = member.favoritesHotel.find((favId) => favId && favId.toString() === id);
-  
-      if (alreadyAdded) {
+      const alreadyAddedFav = hotel.favorites.find((favId) => favId && favId.toString() === memberId);
+      if (alreadyAdded && alreadyAddedFav) {
         const updatedMember = await Member.findByIdAndUpdate(memberId, {
           $pull: { favoritesHotel: id },
         }, {
           new: true,
         });
-  
-        res.status(200).send({ message: 'Remove favorites successfully', member: updatedMember });
+        const updatedHotel = await Hotel.findByIdAndUpdate(id, {
+            $pull: { favorites: memberId },
+          }, {
+            new: true,
+          });
+        res.status(200).send({ message: 'Remove favorites successfully', member: updatedMember ,hotel:updatedHotel });
       } else {
         const updatedMember = await Member.findByIdAndUpdate(memberId, {
           $push: { favoritesHotel: id },
         }, {
           new: true,
         });
-  
-        res.status(200).send({ message: 'Added favorites successfully', member: updatedMember });
+        const updatedHotel = await Hotel.findByIdAndUpdate(id, {
+            $push: { favorites: memberId},
+          }, {
+            new: true,
+          });
+        res.status(200).send({ message: 'Added favorites successfully', member: updatedMember ,hotel:updatedHotel});
       }
     } catch (error) {
       res.status(400).json({ success: false, msg: error.message });

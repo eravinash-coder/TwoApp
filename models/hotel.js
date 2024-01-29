@@ -17,6 +17,7 @@ const hotelSchema = new mongoose.Schema({
   ContactName:String,
   ContactNumber:String,
   ContactEmail:String,
+  favorites:[{type: mongoose.Schema.Types.ObjectId,ref: 'Member'}],
   addedAt:Date
 
 });
