@@ -100,9 +100,9 @@ exports.getHotel = async (req, res) => {
         // Loop through each hotel and check if the member is in its favorites
         for (const hotel of Hotels) {
             const isFav = hotel.favorites.includes(memberId);
-            // Create an object with the "hotel" and "isFav" properties
+            // Flatten the structure
             const responseData = {
-                hotel,
+                ...hotel.toObject(),
                 isFav,
             };
             modifiedHotels.push(responseData);
