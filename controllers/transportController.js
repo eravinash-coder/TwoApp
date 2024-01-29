@@ -279,7 +279,7 @@ exports.getfavoritesTransport = asyncHandler(async (req, res) => {
       }
   
       // Assuming Hotel is the model for hotels
-      const favoritesTransport = await Transport.find({ _id: { $in: member.favoritesPackage } });
+      const favoritesTransport = await Transport.find({ _id: { $in: member.favoritesTransport } });
   
       res.status(200).json({ success: true, favoritesTransport });
     } catch (error) {
