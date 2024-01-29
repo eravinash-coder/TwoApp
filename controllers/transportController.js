@@ -74,7 +74,7 @@ exports.addtransport = asyncHandler(async (req, res) => {
 exports.getTransport = async (req, res) => {
     try {
         const associationId = req.params.associationId;
-
+        const memberId = req.user.memberId;
         const associationExists = await Association.findById(associationId);
         if (!associationExists) {
             return res.status(400).send('Association not found');
@@ -92,10 +92,20 @@ exports.getTransport = async (req, res) => {
         const Transports = await Transport.find({ associationId });
 
 
-        // Create an object with the "association" property
-        const responseData = { Transports };
+        const modifiedtransport = [];
 
-        res.send([responseData]);
+        // Loop through each hotel and check if the member is in its favorites
+        for (const transport of Transports) {
+            const isFav = transport.favorites.includes(memberId);
+            // Flatten the structure
+            const responseData = {
+                ...transport.toObject(),
+                isFav,
+            };
+            modifiedtransport.push(responseData);
+        }
+
+        res.send([{Transport:modifiedtransport}]);
     } catch (error) {
         res.status(500).send(error.message);
     }
@@ -209,5 +219,70 @@ exports.deleteTransport = asyncHandler(async (req, res) => {
         });
     } catch (error) {
         res.status(400).json({ success: false, msg: error.message });
+    }
+});
+
+exports.AddorRemovefavorites = asyncHandler(async (req, res) => {
+    const memberId = req.user.memberId;
+    const id = req.body.TransportId;
+  
+    try {
+      const member = await Member.findById(memberId);
+      const transport = await Transport.findById(id);
+      
+      // Check if member or favorites is null or undefined
+      if (!member || !member.favoritesTransport) {
+        return res.status(400).json({ success: false, msg: 'Member or favorites not found' });
+      }
+  
+      const alreadyAdded = member.favoritesTransport.find((favId) => favId && favId.toString() === id);
+      const alreadyAddedFav = transport.favorites.find((favId) => favId && favId.toString() === memberId);
+      if (alreadyAdded && alreadyAddedFav) {
+        const updatedMember = await Member.findByIdAndUpdate(memberId, {
+          $pull: { favoritesTransport: id },
+        }, {
+          new: true,
+        });
+        const updatedtransport = await Transport.findByIdAndUpdate(id, {
+            $pull: { favorites: memberId },
+          }, {
+            new: true,
+          });
+        res.status(200).send({ message: 'Remove favorites successfully', member: updatedMember ,transport:updatedtransport });
+      } else {
+        const updatedMember = await Member.findByIdAndUpdate(memberId, {
+          $push: { favoritesTransport: id },
+        }, {
+          new: true,
+        });
+        const updatedtransport = await Transport.findByIdAndUpdate(id, {
+            $push: { favorites: memberId},
+          }, {
+            new: true,
+          });
+        res.status(200).send({ message: 'Added favorites successfully', member: updatedMember ,transport:updatedtransport});
+      }
+    } catch (error) {
+      res.status(400).json({ success: false, msg: error.message });
+    }
+});
+
+exports.getfavoritesTransport = asyncHandler(async (req, res) => {
+    const memberId = req.user.memberId;
+  
+    try {
+      const member = await Member.findById(memberId);
+  
+      // Check if member or favoritesHotel is null or undefined
+      if (!member || !member.favoritesTransport) {
+        return res.status(400).json({ success: false, msg: 'Member or favorites not found' });
+      }
+  
+      // Assuming Hotel is the model for hotels
+      const favoritesTransport = await Transport.find({ _id: { $in: member.favoritesPackage } });
+  
+      res.status(200).json({ success: true, favoritesTransport });
+    } catch (error) {
+      res.status(400).json({ success: false, msg: error.message });
     }
 });

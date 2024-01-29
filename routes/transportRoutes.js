@@ -10,5 +10,6 @@ router.get('/GetTransport/:associationId', authassoMiddleware,  transportControl
 router.get('/mytransports', authassoMiddleware, transportController.getMyTransports);
 router.put('/updateTransport/:TransportId', authassoMiddleware, transportController.updateTransport);
 router.delete('/deleteTransport/:TransportId', authassoMiddleware, transportController.deleteTransport);
-
+router.put('/AddorRemovefavorites', authassoMiddleware, transportController.AddorRemovefavorites);
+router.get('/getfavorites', authassoMiddleware, transportController.getfavoritesTransport);
 module.exports = router;
