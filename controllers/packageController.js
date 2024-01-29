@@ -109,7 +109,7 @@ exports.getPackages = async (req, res) => {
             modifiedPackage.push(responseData);
         }
 
-        res.send([{Package:modifiedPackage}]);
+        res.send([{Packages:modifiedPackage}]);
     } catch (error) {
         res.status(400).send(error.message);
     }
