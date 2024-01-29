@@ -10,5 +10,6 @@ router.get('/Getpackages/:associationId', authassoMiddleware,  packageController
 router.get('/mypackages', authassoMiddleware, packageController.getMyPackages);
 router.put('/updatePackage/:PackageId', authassoMiddleware, packageController.updatePackage);
 router.delete('/deletePackage/:PackageId', authassoMiddleware, packageController.deletePackage);
-
+router.post('/AddorRemovefavorites', authassoMiddleware, packageController.AddorRemovefavorites);
+router.get('/getfavorites', authassoMiddleware, packageController.getFavoritePackages);
 module.exports = router;
