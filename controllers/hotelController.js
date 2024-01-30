@@ -289,7 +289,20 @@ exports.getFavoriteHotels = asyncHandler(async (req, res) => {
       // Assuming Hotel is the model for hotels
       const favoriteHotels = await Hotel.find({ _id: { $in: member.favoritesHotel } });
   
-      res.status(200).json({ success: true, favoriteHotels });
+      const modifiedHotels = [];
+
+        // Loop through each hotel and check if the member is in its favorites
+        for (const favoriteHotel of favoriteHotels) {
+            const isFav = true;
+            // Flatten the structure
+            const responseData = {
+                ...favoriteHotel.toObject(),
+                isFav,
+            };
+            modifiedHotels.push(responseData);
+        }
+
+        res.send({success: true,favoriteHotels:modifiedHotels});
     } catch (error) {
       res.status(400).json({ success: false, msg: error.message });
     }

@@ -287,9 +287,22 @@ exports.getFavoritePackages = asyncHandler(async (req, res) => {
       }
   
       // Assuming Hotel is the model for hotels
-      const favoritePackage = await Package.find({ _id: { $in: member.favoritesPackage } });
+      const favoritePackages = await Package.find({ _id: { $in: member.favoritesPackage } });
   
-      res.status(200).json({ success: true, favoritePackage });
+      const modifiedPackages = [];
+
+        // Loop through each hotel and check if the member is in its favorites
+        for (const favoritePackage of favoritePackages) {
+            const isFav = true;
+            // Flatten the structure
+            const responseData = {
+                ...favoritePackage.toObject(),
+                isFav,
+            };
+            modifiedPackages.push(responseData);
+        }
+
+        res.send({success: true ,favoritePackage:modifiedPackages});
     } catch (error) {
       res.status(400).json({ success: false, msg: error.message });
     }
