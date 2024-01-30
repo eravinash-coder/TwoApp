@@ -1,4 +1,4 @@
-const DestinationProgram = require('../models/skillDevelopment');
+const DestinationProgram = require('../models/destinationProgram');
 const asyncHandler = require("express-async-handler");
 
 
