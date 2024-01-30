@@ -21,6 +21,7 @@ const luxuryCruiseRoutes = require('./routes/luxuryCruiseRoutes');
 const charterFlight = require('./routes/charterFlightRoutes');
 const laxuryHotelRoutes = require('./routes/laxuryHotelRoutes');
 const skillDevelopmentRoutes = require('./routes/skillDevelopmentRoutes');
+const destinationProgramRoutes = require('./routes/destinationProgramRoutes');
 
 const morgan = require('morgan');
 
@@ -59,6 +60,7 @@ app.use('/api/luxuryCruise', luxuryCruiseRoutes);
 app.use('/api/charterFlight', charterFlight);
 app.use('/api/LaxuryHotel', laxuryHotelRoutes);
 app.use('/api/skillDevelopment', skillDevelopmentRoutes);
+app.use('/api/destinationProgram', destinationProgramRoutes);
 
 app.get('*', function(req, res){
   res.status(404).json({
