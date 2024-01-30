@@ -294,7 +294,7 @@ exports.getfavoritesTransport = asyncHandler(async (req, res) => {
             modifiedTransports.push(responseData);
         }
 
-        res.send([{ success: true ,favoritesTransport:modifiedTransports}]);
+        res.send({ success: true ,favoritesTransport:modifiedTransports});
     } catch (error) {
       res.status(400).json({ success: false, msg: error.message });
     }
