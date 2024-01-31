@@ -74,6 +74,7 @@ exports.getAllInterview = asyncHandler(async (req, res) => {
   
     query.skip = size * (pageNo - 1);
     query.limit = size;
+    let interviews = await Interview.find({});
     let result = await Interview.find({})
       .sort("-createdAt")
       .limit(Number(query.limit))
@@ -81,7 +82,7 @@ exports.getAllInterview = asyncHandler(async (req, res) => {
   
     res.json({
       success: true,
-      count: result.length,
+      count: interviews.length,
       limit: Number(query.limit),
       data: result,
     });
