@@ -10,5 +10,7 @@ const categorySchema = new mongoose.Schema({
     }
 });
 
-
+categorySchema.statics.findByName = function (categoryName) {
+    return this.findOne({ category_name: categoryName });
+};
 module.exports = mongoose.model('Category', categorySchema)

@@ -1,5 +1,4 @@
 const express = require('express');
-const handler = require('../helpers/upload');
 const router = express.Router();
 const visaController = require('../controllers/visaController')
 

@@ -1,53 +1,39 @@
 const express = require('express');
-const router = express.Router()
-const path = require('path');
-const bodyParser = require('body-parser');
-const user = express();
-
-router.use(bodyParser.urlencoded({ extended: true }));
-router.use(express.static(path.resolve(__dirname, 'public')));
-
-const multer = require('multer');
-
-var uploader = multer({
-  storage: multer.memoryStorage({}),
-  limits: { fileSize: 500000 }
-});
-const {
-    addNews, getAllNews, getNewsByUser,getTodayNews, getNewsId, getNewsByCategory, editNews, sliderNews, getRelatedNews, addComment, removeComment
-} = require('../controllers/newsController');
+const router = express.Router();
+const  newsController = require('../controllers/newsController');
 
 const protect = require('../middleware/authMiddleware.js')
 
-router.route('/addNews').post(uploader.single("file"),addNews);
-router.route('/getAllNews/:page/:perPage').get(getAllNews);
-router.route('/getAllNews/me/:page/:perPage').get(protect, getNewsByUser);
-router.route('/getAllNews/slider').get(sliderNews);
-router.route('/getNews/by/today').get(getTodayNews)
-router.route('/getById/:newsId').get(getNewsId);
-router.route('/getByCategory/:catId/:page/:perPage').get(getNewsByCategory);
-router.route('/getrelatedNews/:catId').get(getRelatedNews);
+router.post('/addNews',newsController.addNews);
+router.get('/getAllNews/:page/:perPage',newsController.getAllNews);
+router.get('/getNews',newsController.getNews);
+router.get('/getAllNews/me/:page/:perPage',protect,newsController.getNewsByUser);
+router.get('/getAllNews/slider',newsController.sliderNews);
+router.get('/getNews/by/today',newsController.getTodayNews)
+router.get('/getById/:newsId',newsController.getNewsId);
+router.get('/getByCategory/:catId/:page/:perPage',newsController.getNewsByCategory);
+router.get('/getrelatedNews/:catId',newsController.getRelatedNews);
 
-router.route('/editNews/:newsId').put(editNews);
+router.put('/editNews/:newsId',newsController.editNews);
 
-router.route('/add/comment/onNews').put(protect, addComment);
-
-
-router.route('/remove/comment/onNews').delete(protect, removeComment);
+router.put('/add/comment/onNews',protect,newsController.addComment);
 
 
-
+router.delete('/remove/comment/onNews',protect,newsController.removeComment);
 
 
 
 
-// router.route('/login').post(authUser)
+
+
+
+// router.get('/login').post(authUser)
 // router
-//   .route('/profile')
+//   .get('/profile')
 //   .get(protect, getUserProfile)
 //   .put(protect, updateUserProfile)
 // router
-//   .route('/:id')
+//   .get('/:id')
 // //   .delete(protect, deleteUser)
 //   .get(protect, getUserById)
 // //   .put(protect, updateUser)

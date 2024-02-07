@@ -13,9 +13,7 @@ const newsSchema = new mongoose.Schema({
     url: {
         type: String
     },
-    urlToImage: {
-        type: String
-    },
+    urlToImage: [Object],
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category'
@@ -65,5 +63,20 @@ const newsSchema = new mongoose.Schema({
     }
 });
 
+newsSchema.pre('save', async function (next) {
+    if (this.isModified('categoryName') || this.isNew) {
+        try {
+            const category = await mongoose.model('Category').findByName(this.categoryName);
+            if (category) {
+                this.category = category._id;
+            }
+            next();
+        } catch (error) {
+            next(error);
+        }
+    } else {
+        next();
+    }
+});
 
 module.exports = mongoose.model('News', newsSchema)

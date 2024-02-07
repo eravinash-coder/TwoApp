@@ -8,6 +8,7 @@ const imageToBase64 = require('image-to-base64');
 // @access  Private
 const addCategory = asyncHandler(async (req, res) => {
     const { category_name } = req.body
+    console.log(req.body);
     const category = await Category.findOne({ category_name: category_name });
 
     if (category) {
@@ -60,8 +61,17 @@ const getAllCategories = asyncHandler(async (req, res) => {
     })
 })
 
+const getCategories = asyncHandler(async (req, res) => {
+    const category = await Category.findById(req.params.catId);
+    res.json({
+        success: true,
+        data: category
+    })
+})
+
 
 const editCategory = asyncHandler(async (req, res) => {
+    console.log(req.body);
     let category = await Category.findById(req.params.catId);
 
     if (!category) {
@@ -110,5 +120,6 @@ module.exports = {
     deleteCategory,
     getAllCategories,
     editCategory,
+    getCategories,
     imageUpload
 }

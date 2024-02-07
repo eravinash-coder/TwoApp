@@ -1,28 +1,59 @@
 const asyncHandler = require("express-async-handler");
 const News = require("../models/newsModel.js");
-const Upload = require("../helpers/upload");
 
 
-// @desc    Add News
-// @route   POST /api/news/addNews
-// @access  Private
-const addNews = asyncHandler(async (req, res) => {
-  const { title, content, url, author, category, audio, categoryName } = req.body;
+
+const multer = require('multer');
+
+const handleUpload = require('../helpers/upload')
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+const myUploadMiddleware = upload.fields([
+  { name: 'image', maxCount: 10 },
+]);
+
+
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
+}
+
+exports.addNews = asyncHandler(async (req, res) => {
   try {
-    const upload = await Upload.uploadFile(req.file.path);
+    await runMiddleware(req, res, myUploadMiddleware);
+    const { title, content, url, author, audio, categoryName } = req.body;
+    let imageObjects;
+    console.log('Received data:', req.body);
+    console.log('Received files:', req.files);
+    
+    if (req.files && req.files['image']) {
+      imageObjects = await Promise.all(
+        req.files['image'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
+    }
     var news = new News({
       author,
       title,
       content,
-      category,
       categoryName,
       url,
-      urlToImage: upload.secure_url,
+      urlToImage: imageObjects,
       audio,
       addedAt: Date.now(),
     });
+
     var record = await news.save();
-    
+
     // Send success response inside the try block
     res.status(201).json({
       success: true,
@@ -35,10 +66,10 @@ const addNews = asyncHandler(async (req, res) => {
     res.status(400).json({ success: false, msg: error.message });
   }
 
-  
+
 });
 
-const getAllNews = asyncHandler(async (req, res) => {
+exports.getAllNews = asyncHandler(async (req, res) => {
   console.log("page number : " + req.params.page);
   console.log("per page : " + req.params.perPage);
   var size = req.params.perPage;
@@ -75,7 +106,7 @@ const getAllNews = asyncHandler(async (req, res) => {
   });
 });
 
-const getNewsByUser = asyncHandler(async (req, res) => {
+exports.getNewsByUser = asyncHandler(async (req, res) => {
   var size = req.params.perPage;
   var pageNo = req.params.page; // parseInt(req.query.pageNo)
 
@@ -114,7 +145,7 @@ const getNewsByUser = asyncHandler(async (req, res) => {
   // })
 });
 
-const getNewsId = asyncHandler(async (req, res) => {
+exports.getNewsId = asyncHandler(async (req, res) => {
   const news = await News.findById(req.params.newsId)
     .populate({ path: "category", select: ["_id", "category_name"] })
     .populate({ path: "addedBy", select: ["name", "email"] })
@@ -136,7 +167,7 @@ const getNewsId = asyncHandler(async (req, res) => {
   // })
 });
 
-const getNewsByCategory = asyncHandler(async (req, res) => {
+exports.getNewsByCategory = asyncHandler(async (req, res) => {
   // const news = await News.find({ category: req.params.catId }).populate({ path: 'category', select: ['_id', 'category_name'] }).populate({ path: 'addedBy', select: ['name', 'email'] });
 
   console.log("page number : " + req.params.page);
@@ -175,34 +206,54 @@ const getNewsByCategory = asyncHandler(async (req, res) => {
   });
 });
 
-const editNews = asyncHandler(async (req, res) => {
-  let news = await News.findById(req.params.newsId);
+exports.editNews = asyncHandler(async (req, res) => {
+  try {
+    
+    await runMiddleware(req, res, myUploadMiddleware);
+    const { title, content, url, author, audio, categoryName } = req.body;
+    let news = await News.findById(req.params.newsId);
+    console.log('Received data:', req.body);
+    console.log('Received files:', req.files);
+    let imageObjects;
+    
+    if (req.files && req.files['image']) {
+      imageObjects = await Promise.all(
+        req.files['image'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
+    }
+    news.author = author;
+    news.title = title;
+    news.content = content;
+    news.categoryName=categoryName;
+    news.urlToImage=imageObjects,
 
-  if (!news) {
-    return res.status(401).json({
-      success: false,
-      msg: "News not found.",
+   await news.save();
+
+    // Send success response inside the try block
+    res.status(201).json({
+      success: true,
+      msg: "Successfully Updated News",
+      
     });
+
+  } catch (error) {
+    // Send error response inside the catch block
+    res.status(400).json({ success: false, msg: error.message });
   }
-
-  news = await News.findByIdAndUpdate(req.params.newsId, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  res
-    .status(200)
-    .json({ success: true, data: news, msg: "Successfully updated" });
 });
 
-const sliderNews = asyncHandler(async (req, res) => {
+exports.sliderNews = asyncHandler(async (req, res) => {
   const news = await News.find({ addToSlider: true })
     .populate({ path: "category", select: ["_id", "category_name"] })
     .populate({ path: "addedBy", select: ["name", "email"] });
   res.status(200).json({ success: true, total: news.length, data: news });
 });
 
-const getRelatedNews = asyncHandler(async (req, res) => {
+exports.getRelatedNews = asyncHandler(async (req, res) => {
   const news = await News.find({ category: req.params.catId })
     .limit(10)
     .populate({ path: "category", select: ["_id", "category_name"] })
@@ -210,7 +261,7 @@ const getRelatedNews = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, total: news.length, data: news });
 });
 
-const addComment = asyncHandler(async (req, res) => {
+exports.addComment = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const newsId = req.body.newsId;
   const comment = req.body.comment;
@@ -229,7 +280,7 @@ const addComment = asyncHandler(async (req, res) => {
     .json({ success: true, data: news, msg: "You have added a comment." });
 });
 
-const removeComment = asyncHandler(async (req, res) => {
+exports.removeComment = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const newsId = req.body.newsId;
   const commentId = req.body.commentId;
@@ -270,7 +321,7 @@ const removeComment = asyncHandler(async (req, res) => {
   });
 });
 
-const getTodayNews = asyncHandler(async (req, res) => {
+exports.getTodayNews = asyncHandler(async (req, res) => {
 
   let result = await News.find({
     updatedAt: {
@@ -286,16 +337,15 @@ const getTodayNews = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = {
-  addNews,
-  getAllNews,
-  getTodayNews,
-  getNewsId,
-  getNewsByUser,
-  getNewsByCategory,
-  editNews,
-  sliderNews,
-  getRelatedNews,
-  addComment,
-  removeComment,
-};
+exports.getNews = asyncHandler(async (req, res) => {
+  
+
+  let news = await News.find({});
+
+
+  
+  res.json({
+    success: true,
+    data: news,
+  });
+});
