@@ -349,3 +349,24 @@ exports.getNews = asyncHandler(async (req, res) => {
     data: news,
   });
 });
+
+exports.deleteNews = asyncHandler(async (req, res) => {
+  console.log(req.params.catId)
+  const news = await News.findByIdAndDelete(req.params.newsId);
+
+  console.log(news)
+
+  res.status(201).json({
+      success: true,
+      msg: 'Successfully Deleted',
+      data: news
+  })
+
+  if (!news) {
+      return res.status(401).json({
+          success: false,
+          msg: 'News not found.'
+      })
+  }
+
+})

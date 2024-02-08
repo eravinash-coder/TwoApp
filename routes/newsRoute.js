@@ -20,6 +20,7 @@ router.put('/add/comment/onNews',protect,newsController.addComment);
 
 
 router.delete('/remove/comment/onNews',protect,newsController.removeComment);
+router.delete('/deleteNews/:newsId',newsController.deleteNews)
 
 
 

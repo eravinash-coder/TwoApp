@@ -2,44 +2,70 @@ const Association = require('../models/Association');
 const asyncHandler = require("express-async-handler");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const Upload = require("../helpers/upload");
-const { has } = require('lodash');
 
 
+const multer = require('multer');
 
+const handleUpload = require('../helpers/upload')
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+const myUploadMiddleware = upload.fields([
+  { name: 'image', maxCount: 10 },
+]);
+
+
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
+}
 
 
 exports.register = asyncHandler(async (req, res) => {
-  const { name, type, shortName, email, password } = req.body;
-
-  // Hash the password
-  const hashedPassword = await bcrypt.hash(password, 10);
-
   try {
-    // Upload the file and get the secure URL
-    const upload = await Upload.uploadFile(req.file.path);
-
-    // Create a new Association instance
-    const association = new Association({
+    await runMiddleware(req, res, myUploadMiddleware);
+    const { name, type, shortName, email, password } = req.body;
+    let imageObjects;
+  
+    
+    if (req.files && req.files['image']) {
+      imageObjects = await Promise.all(
+        req.files['image'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    var association = new Association({
       name,
       type,
       shortName,
       email,
       password: hashedPassword,
-      image: upload.secure_url,
+      image: imageObjects
     });
-
-    // Save the association record to the database
-    const record = await association.save();
-
+  
+    var record = await association.save();
+  
+    // Send success response inside the try block
     res.status(201).json({
       success: true,
-      msg: 'Association Uploaded Successfully!',
+      msg: "Association Uploaded Successfully!",
       data: record,
     });
+  
   } catch (error) {
+    // Send error response inside the catch block
     res.status(400).json({ success: false, msg: error.message });
   }
+  
 });
 
 exports.login = async (req, res) => {
@@ -90,3 +116,96 @@ exports.getAllAssociations = async (req, res) => {
     res.status(500).send(error.message);
   }
 };
+
+exports.getAssociationById = asyncHandler(async (req, res) => {
+  const association = await Association.findById(req.params.associationId)
+    
+
+  
+
+  res.json({
+    success: true,
+    data: association,
+  });
+ 
+});
+
+
+exports.getAssociaton = asyncHandler(async (req, res) => {
+  
+
+  let association = await Association.find({});
+
+
+  
+  res.json({
+    success: true,
+    data: association,
+  });
+});
+
+exports.editAssociation = asyncHandler(async (req, res) => {
+  try {
+    
+    await runMiddleware(req, res, myUploadMiddleware);
+    const { name, type, shortName, email , password} = req.body;
+    console.log(req.body);
+    let association = await Association.findById(req.params.associationId);
+    
+
+    
+    let imageObjects;
+    
+    
+
+    if (req.files && req.files['image']) {
+      imageObjects = await Promise.all(
+        req.files['image'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
+    }
+    
+    association.name = name;
+    association.shortName=shortName;
+    association.type = type;
+    association.email=email;
+    association.image=imageObjects;
+    association.password=password;
+
+
+   await association.save();
+
+    // Send success response inside the try block
+    res.status(201).json({
+      success: true,
+      msg: "Successfully Updated Association",
+      
+    });
+
+  } catch (error) {
+    // Send error response inside the catch block
+    res.status(400).json({ success: false, msg: error.message });
+  }
+});
+
+
+exports.deleteAssociation = asyncHandler(async (req, res) => {
+  
+  const association = await Association.findByIdAndDelete(req.params.associationId);
+
+  if (!association) {
+    return res.status(401).json({
+      success: false,
+      msg: 'Interview not found.'
+    });
+  }
+
+  res.status(201).json({
+    success: true,
+    msg: 'Successfully Deleted',
+    data: association
+  });
+});

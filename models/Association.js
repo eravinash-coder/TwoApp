@@ -5,7 +5,7 @@ const associationSchema = new mongoose.Schema({
   type:String,
   shortName: String,
   email: String,
-  image: String,
+  image: [Object],
   password: String,
 });
 
