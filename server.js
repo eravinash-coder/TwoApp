@@ -32,8 +32,8 @@ const morgan = require('morgan');
 connectDB();
 
 const app = express();
-
-app.use(express.json())
+app.use(formData.parse({ limit: '100mb' }));
+app.use(express.json({ limit: '100mb' }));
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
