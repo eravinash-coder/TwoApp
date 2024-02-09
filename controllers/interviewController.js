@@ -3,8 +3,11 @@ const asyncHandler = require("express-async-handler");
 const multer = require('multer');
 
 const handleUpload = require('../helpers/upload')
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+});
+
 const myUploadMiddleware = upload.fields([
   { name: 'videos', maxCount: 10 },
   { name: 'image', maxCount: 10 },
