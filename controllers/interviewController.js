@@ -4,11 +4,11 @@ const asyncHandler = require("express-async-handler");
 
 exports.addInterview = asyncHandler(async (req, res) => {
   try {
-    
 
-    const { title ,video,  } = req.body;
-    
-    const interview = new Interview({ title, video });
+
+    const { title, videos, } = req.body;
+
+    const interview = new Interview({ title, videos });
 
     await interview.save();
 
@@ -74,46 +74,21 @@ exports.getInterviews = asyncHandler(async (req, res) => {
 
 exports.editInterview = asyncHandler(async (req, res) => {
   try {
-    
-    await runMiddleware(req, res, myUploadMiddleware);
-    const { title } = req.body;
+
+
+    const { title, videos, } = req.body;
     let interview = await Interview.findById(req.params.InterviewId);
-    console.log(req.params.InterviewId);
-
-    
-    let imageObjects , videObjects;
-    
-    if (req.files && req.files['videos']) {
-      videObjects = await Promise.all(
-        req.files['videos'].map(async (file) => {
-          const b64 = Buffer.from(file.buffer).toString('base64');
-          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
-          return handleUpload(dataURI);
-        })
-      );
-    }
-
-    if (req.files && req.files['image']) {
-      imageObjects = await Promise.all(
-        req.files['image'].map(async (file) => {
-          const b64 = Buffer.from(file.buffer).toString('base64');
-          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
-          return handleUpload(dataURI);
-        })
-      );
-    }
-    
     interview.title = title;
-    interview.thumbnail = content;
-    interview.videos=categoryName;
+    interview.videos = videos;
 
-   await news.save();
+
+    await news.save();
 
     // Send success response inside the try block
     res.status(201).json({
       success: true,
       msg: "Successfully Updated News",
-      
+
     });
 
   } catch (error) {
@@ -124,7 +99,6 @@ exports.editInterview = asyncHandler(async (req, res) => {
 
 
 exports.deleteInterview = asyncHandler(async (req, res) => {
-  console.log(req.params.InterviewId);
   const interview = await Interview.findByIdAndDelete(req.params.InterviewId);
 
   if (!interview) {
@@ -144,13 +118,13 @@ exports.deleteInterview = asyncHandler(async (req, res) => {
 
 exports.getInterviewById = asyncHandler(async (req, res) => {
   const interview = await Interview.findById(req.params.InterviewId)
-    
 
-  
+
+
 
   res.json({
     success: true,
     data: interview,
   });
- 
+
 });
