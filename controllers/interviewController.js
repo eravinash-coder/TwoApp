@@ -1,61 +1,14 @@
 const Interview = require('../models/interview');
 const asyncHandler = require("express-async-handler");
-const multer = require('multer');
 
-const handleUpload = require('../helpers/upload')
-const storage = multer.memoryStorage();
-const upload = multer({
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
-});
-
-
-const myUploadMiddleware = upload.fields([
-  { name: 'videos', maxCount: 10 },
-  { name: 'image', maxCount: 10 },
-
-]);
-
-
-function runMiddleware(req, res, fn) {
-  return new Promise((resolve, reject) => {
-    fn(req, res, (result) => {
-      if (result instanceof Error) {
-        return reject(result);
-      }
-      return resolve(result);
-    });
-  });
-}
 
 exports.addInterview = asyncHandler(async (req, res) => {
   try {
-    await runMiddleware(req, res, myUploadMiddleware);
+    
 
-    const { title } = req.body;
-    let videosObjects,imageObjects;
-
-    if (req.files && req.files['videos']) {
-      videosObjects = await Promise.all(
-        req.files['videos'].map(async (file) => {
-          const b64 = Buffer.from(file.buffer).toString('base64');
-          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
-          return handleUpload(dataURI);
-        })
-      );
-    }
-
-    if (req.files && req.files['image']) {
-      imageObjects = await Promise.all(
-        req.files['image'].map(async (file) => {
-          const b64 = Buffer.from(file.buffer).toString('base64');
-          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
-          return handleUpload(dataURI);
-        })
-      );
-    }
-
-    const interview = new Interview({ title, videos: videosObjects ,thumbnail:imageObjects });
+    const { title ,video,  } = req.body;
+    
+    const interview = new Interview({ title, video });
 
     await interview.save();
 

@@ -21,9 +21,7 @@ const newsSchema = new mongoose.Schema({
     categoryName: {
         type: String
     },
-    audio: {
-        type: String
-    },
+    audio: [Object],
     views: {
         type: Number,
         default: 0

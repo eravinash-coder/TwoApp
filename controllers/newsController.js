@@ -10,6 +10,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const myUploadMiddleware = upload.fields([
   { name: 'image', maxCount: 10 },
+  { name: 'audio', maxCount: 10 },
 ]);
 
 
@@ -27,14 +28,22 @@ function runMiddleware(req, res, fn) {
 exports.addNews = asyncHandler(async (req, res) => {
   try {
     await runMiddleware(req, res, myUploadMiddleware);
-    const { title, content, url, author, audio, categoryName } = req.body;
-    let imageObjects;
-    console.log('Received data:', req.body);
-    console.log('Received files:', req.files);
+    const { title, content, author, categoryName } = req.body;
+    let imageObjects, audioObjects;
+  
     
     if (req.files && req.files['image']) {
       imageObjects = await Promise.all(
         req.files['image'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
+    }
+    if (req.files && req.files['audio']) {
+      audioObjects = await Promise.all(
+        req.files['audio'].map(async (file) => {
           const b64 = Buffer.from(file.buffer).toString('base64');
           const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
           return handleUpload(dataURI);
@@ -46,9 +55,8 @@ exports.addNews = asyncHandler(async (req, res) => {
       title,
       content,
       categoryName,
-      url,
       urlToImage: imageObjects,
-      audio,
+      audio:audioObjects,
       addedAt: Date.now(),
     });
 
@@ -210,11 +218,10 @@ exports.editNews = asyncHandler(async (req, res) => {
   try {
     
     await runMiddleware(req, res, myUploadMiddleware);
-    const { title, content, url, author, audio, categoryName } = req.body;
+    const { title, content,  author, categoryName } = req.body;
     let news = await News.findById(req.params.newsId);
-    console.log('Received data:', req.body);
-    console.log('Received files:', req.files);
-    let imageObjects;
+    
+    let imageObjects , audioObjects;
     
     if (req.files && req.files['image']) {
       imageObjects = await Promise.all(
@@ -225,11 +232,22 @@ exports.editNews = asyncHandler(async (req, res) => {
         })
       );
     }
+
+    if (req.files && req.files['audio']) {
+      audioObjects = await Promise.all(
+        req.files['audio'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
+    }
     news.author = author;
     news.title = title;
     news.content = content;
     news.categoryName=categoryName;
-    news.urlToImage=imageObjects,
+    news.urlToImage=imageObjects;
+    news.audio= audioObjects;
 
    await news.save();
 
