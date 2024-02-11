@@ -75,20 +75,17 @@ exports.getInterviews = asyncHandler(async (req, res) => {
 exports.editInterview = asyncHandler(async (req, res) => {
   try {
 
-
-    const { title, videos, } = req.body;
+    const {  title, videos } = req.body;
     let interview = await Interview.findById(req.params.InterviewId);
     interview.title = title;
     interview.videos = videos;
 
-
-    await news.save();
-
+    const interviewu = await interview.save();
     // Send success response inside the try block
     res.status(201).json({
       success: true,
       msg: "Successfully Updated News",
-
+      data:interviewu
     });
 
   } catch (error) {
