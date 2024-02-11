@@ -5,6 +5,6 @@ const chaptersController = require('../controllers/chaptersController');
 
 
 router.post('/addChapters', chaptersController.addChapters);
-router.get('/getChapters', chaptersController.getChapters);
+router.get('/getChapters/:associationId', chaptersController.getChapters);
 
 module.exports = router;

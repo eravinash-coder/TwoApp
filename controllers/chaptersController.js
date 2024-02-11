@@ -19,17 +19,19 @@ exports.addChapters = async (req, res) => {
     }
 };
 
-exports.getChapters = asyncHandler(async (req, res) => {
-
-    const { associationId } = req.body;
-
-    let chapters = await Chapters.findById(associationId);
-
+exports.getChapters = async (req, res) => {
+    try {
+        const associationId = req.params.associationId
+        const chapters = await Chapters.find({ associationId });
 
 
-    res.json({
-        success: true,
-        data: chapters,
-    });
-});
+
+        res.json({
+            success: true,
+            data: chapters,
+        });
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
 
