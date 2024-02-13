@@ -28,7 +28,8 @@ const authUser = asyncHandler(async (req, res) => {
         token: generateToken(user._id),
         redirectUrl: "/admin"
       })
-    } else if (association && (await bcrypt.compare(password, association.password))){
+    } 
+    else if (association && (await bcrypt.compare(password, association.password))){
       res.json({
         token: generateToken(association._id),
         redirectUrl: "/association"

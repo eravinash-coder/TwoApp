@@ -30,7 +30,7 @@ exports.register = asyncHandler(async (req, res) => {
   try {
     await runMiddleware(req, res, myUploadMiddleware);
     const { name, type, shortName, email, password } = req.body;
-    const userExists = await User.findOne({ email });
+    const userExists = await Association.findOne({ email });
     if (userExists) {
       return res.status(400).json({
         success: false,
@@ -48,6 +48,7 @@ exports.register = asyncHandler(async (req, res) => {
       );
     }
     const hashedPassword = await bcrypt.hash(password, 10);
+    console.log
     var association = new Association({
       name,
       type,
@@ -161,7 +162,7 @@ exports.editAssociation = asyncHandler(async (req, res) => {
     
     let imageObjects;
     
-    
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     if (req.files && req.files['image']) {
       imageObjects = await Promise.all(
@@ -178,7 +179,7 @@ exports.editAssociation = asyncHandler(async (req, res) => {
     association.type = type;
     association.email=email;
     association.image=imageObjects;
-    association.password=password;
+    association.password=hashedPassword;
 
 
    await association.save();
