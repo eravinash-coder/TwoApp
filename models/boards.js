@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const BoardsSchema = new mongoose.Schema({
   associationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Association' },
+  urlToImage: [Object],
   name:String,
   post:String,
   email:String,

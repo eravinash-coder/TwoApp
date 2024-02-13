@@ -4,7 +4,7 @@ const Association = require('../models/Association');
 exports.addAbout = async (req, res) => {
     try {
         const { associationId, about } = req.body;
-
+    console.log(req.body);
         const associationExists = await Association.findById(associationId);
         if (!associationExists) {
             return res.status(404).send('Association not found');

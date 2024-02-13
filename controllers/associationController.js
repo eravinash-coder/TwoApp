@@ -30,9 +30,14 @@ exports.register = asyncHandler(async (req, res) => {
   try {
     await runMiddleware(req, res, myUploadMiddleware);
     const { name, type, shortName, email, password } = req.body;
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({
+        success: false,
+        msg: 'Entered email id already registered with us. Login to continue'
+      })
+    }
     let imageObjects;
-  
-    
     if (req.files && req.files['image']) {
       imageObjects = await Promise.all(
         req.files['image'].map(async (file) => {
@@ -199,7 +204,7 @@ exports.deleteAssociation = asyncHandler(async (req, res) => {
   if (!association) {
     return res.status(401).json({
       success: false,
-      msg: 'Interview not found.'
+      msg: 'Association not found.'
     });
   }
 

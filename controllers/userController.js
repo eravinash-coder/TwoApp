@@ -1,34 +1,48 @@
 const asyncHandler = require('express-async-handler')
 const generateToken = require('../utils/generateToken.js')
 const User = require('../models/userModel.js')
+const Association = require('../models/Association.js')
+const bcrypt = require('bcrypt');
 var crypto = require('crypto');
 var mailer = require('../utils/mailer');
-const { generateOtp,verifyOtp } = require('../utils/otp.js');
+const { generateOtp, verifyOtp } = require('../utils/otp.js');
 
 
 // @desc    Auth user & get token
 // @route   POST /api/users/login
 // @access  Public
 const authUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body
-  console.log(req.body);
 
-  const user = await User.findOne({ email })
+  try {
+    const { email, password } = req.body
 
-  if (user && (await user.matchPassword(password))) {
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      avatar: user.avatar,
-      token: generateToken(user._id),
-      favorites: user.favorites,
-    })
-  } else {
-    res.status(401).json({
-      success: false,
-      msg: 'Unauthorized user'
-    })
+    const user = await User.findOne({ email })
+    const association = await Association.findOne({email});
+
+    if (user && (await user.matchPassword(password))) {
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        token: generateToken(user._id),
+        redirectUrl: "/admin"
+      })
+    } else if (association && (await bcrypt.compare(password, association.password))){
+      res.json({
+        token: generateToken(association._id),
+        redirectUrl: "/association"
+      })
+    }
+    else {
+      res.status(401).json({
+        success: false,
+        msg: 'Unauthorized user'
+      })
+    }
+
+  } catch (error) {
+    res.status(401).send(error.message);
   }
 })
 
@@ -47,7 +61,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
       msg: 'Entered email id already registered with us. Login to continue'
     })
   }
-  
+
 
   const user = new User({
     name,
@@ -56,14 +70,14 @@ const registerUser = asyncHandler(async (req, res, next) => {
   })
 
 
-    // save user object
-    user.save(function (err, user) {
-      if (err) return next(err);
-      res.status(201).json({
-        success: true,
-        msg: 'Account Created Sucessfully. Please log in.'
-      });
+  // save user object
+  user.save(function (err, user) {
+    if (err) return next(err);
+    res.status(201).json({
+      success: true,
+      msg: 'Account Created Sucessfully. Please log in.'
     });
+  });
 
   // if (user) {
   //   res.status(201).json({
@@ -191,7 +205,7 @@ const updateUser = asyncHandler(async (req, res) => {
 })
 
 
-const resetPassword = asyncHandler(async(req,res) => {
+const resetPassword = asyncHandler(async (req, res) => {
 
   // console.log(verifyOtp(req.body.token));
   console.log(req.body.token)
@@ -224,23 +238,23 @@ const resetPassword = asyncHandler(async(req,res) => {
   // }
 });
 
-const addToFav = asyncHandler(async(req, res) => {
-    const newsId = req.params.newsId;
-    const userId = req.user._id;
+const addToFav = asyncHandler(async (req, res) => {
+  const newsId = req.params.newsId;
+  const userId = req.user._id;
 
-    // let obj = arr.find(o => o.name === 'string 1');
-    // check if exist news in fav array or not
+  // let obj = arr.find(o => o.name === 'string 1');
+  // check if exist news in fav array or not
 
-    let user = await User.findById(userId);
-    console.log("user", user)
+  let user = await User.findById(userId);
+  console.log("user", user)
 
-    let foundNews = user.favorites.find( obj => {
-      console.log(obj)
-      return obj.news == newsId
-    });
+  let foundNews = user.favorites.find(obj => {
+    console.log(obj)
+    return obj.news == newsId
+  });
 
-    console.log("foundNews", foundNews)
-    if(foundNews) {
+  console.log("foundNews", foundNews)
+  if (foundNews) {
 
 
     let newUserData = user.favorites.filter((obj) => {
@@ -250,33 +264,34 @@ const addToFav = asyncHandler(async(req, res) => {
 
     user.favorites = newUserData;
 
-      await user.save()
+    await user.save()
 
-      return res.status(201).json({
-        success: true,
-        msg: 'Removed from your favorite lists.'
-      })
-    }
-
-   let user1 =  user.favorites.push({news: newsId});
-    await user.save();
-    console.log(user1)
-
-     res.status(201).json({
+    return res.status(201).json({
       success: true,
-      msg: 'Added to your favorite lists.'
+      msg: 'Removed from your favorite lists.'
     })
+  }
+
+  let user1 = user.favorites.push({ news: newsId });
+  await user.save();
+  console.log(user1)
+
+  res.status(201).json({
+    success: true,
+    msg: 'Added to your favorite lists.'
+  })
 
 })
 
 
 
-const getFavorites = asyncHandler(async(req, res) => {
+const getFavorites = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const user = await User.findById(userId)
-    .populate({path: 'favorites.news',
-    populate: ('category')
-})
+    .populate({
+      path: 'favorites.news',
+      populate: ('category')
+    })
 
 
   console.log(req)
@@ -288,20 +303,20 @@ const getFavorites = asyncHandler(async(req, res) => {
 })
 
 
-const checkFavExistsOrNot = asyncHandler(async(req, res) => {
+const checkFavExistsOrNot = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const newsId = req.params.newsId
 
   let user = await User.findById(userId);
   console.log("user", user)
 
-  let foundNews = user.favorites.find( obj => {
+  let foundNews = user.favorites.find(obj => {
     console.log(obj)
     return obj.news == newsId
   });
 
   console.log("foundNews", foundNews)
-  if(!foundNews) {
+  if (!foundNews) {
     return res.json({
       success: true,
       exists: false,
@@ -318,20 +333,20 @@ const checkFavExistsOrNot = asyncHandler(async(req, res) => {
 
 
 
-const removeFavorite = asyncHandler(async(req, res) => {
+const removeFavorite = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const newsId = req.params.newsId
 
   let user = await User.findById(userId);
   console.log("user", user)
 
-  let foundNews = user.favorites.find( obj => {
+  let foundNews = user.favorites.find(obj => {
     console.log(obj)
     return obj.news == newsId
   });
 
   console.log("foundNews", foundNews)
-  if(!foundNews) {
+  if (!foundNews) {
     return res.json({
       success: false,
       msg: 'News id not exists in your favorite list.'
