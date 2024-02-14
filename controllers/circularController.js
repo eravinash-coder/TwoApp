@@ -97,21 +97,21 @@ exports.editCircular = asyncHandler(async (req, res) => {
   try {
     
     
-    let member = await Member.findById(req.params.circularId);
+    let circular = await Circular.findById(req.params.circularId);
 
-    if (!member) {
+    if (!circular) {
         return res.status(401).json({
             success: false,
             msg: 'Category not found.'
         })
     }
     const { title, content } = req.body;
-    member = await Circular.findByIdAndUpdate(req.params.updateId, {title, content }, {
+    circular = await Circular.findByIdAndUpdate(req.params.circularId, {title, content }, {
         new: true,
         runValidators: true
     });
 
-    res.status(200).json({ success: true, data: member, msg: 'Successfully updated' });
+    res.status(200).json({ success: true, data: circular, msg: 'Successfully updated' });
     
 
   } catch (error) {

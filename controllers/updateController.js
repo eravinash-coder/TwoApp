@@ -5,8 +5,9 @@ const asyncHandler = require("express-async-handler");
 const Upload = require("../helpers/upload");
 
 exports.addUpdate = asyncHandler(async (req, res) => {
-  const { title, content, associationId } = req.body;
   try {
+    const { title, content} = req.body;
+    const associationId = req.user.associationId
     const associationExists = await Association.findById(associationId);
     if (!associationExists) {
       return res.status(404).send('Association not found');
@@ -20,12 +21,11 @@ exports.addUpdate = asyncHandler(async (req, res) => {
     if (!isAssociation) {
       return res.status(403).send('Unauthorized');
     }
-    const upload = await Upload.uploadFile(req.file.path);
+    
     var update = new Update({
       associationId,
       title,
       content,
-      urlToImage: upload.secure_url,
       addedAt: Date.now(),
     });
     var record = await update.save();
@@ -97,21 +97,21 @@ exports.editUpdate = asyncHandler(async (req, res) => {
   try {
     
     
-    let member = await Member.findById(req.params.updateId);
+    let update = await Update.findById(req.params.updateId);
 
-    if (!member) {
+    if (!update) {
         return res.status(401).json({
             success: false,
             msg: 'Category not found.'
         })
     }
     const { title, content } = req.body;
-    member = await Member.findByIdAndUpdate(req.params.updateId, {title, content }, {
+    update = await Update.findByIdAndUpdate(req.params.updateId, {title, content }, {
         new: true,
         runValidators: true
     });
 
-    res.status(200).json({ success: true, data: member, msg: 'Successfully updated' });
+    res.status(200).json({ success: true, data: update, msg: 'Successfully updated' });
     
 
   } catch (error) {
