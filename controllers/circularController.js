@@ -80,3 +80,72 @@ exports.getCirculars = async (req, res) => {
     res.status(500).send(error.message);
   }
 };
+
+
+exports.getAllCircular = asyncHandler(async (req, res) => {
+  
+  const associationId = req.user.associationId;
+  let circular = await Circular.find({associationId});
+
+ res.json({
+   success: true,
+   data: circular,
+ });
+});
+
+exports.editCircular = asyncHandler(async (req, res) => {
+  try {
+    
+    
+    let member = await Member.findById(req.params.circularId);
+
+    if (!member) {
+        return res.status(401).json({
+            success: false,
+            msg: 'Category not found.'
+        })
+    }
+    const { title, content } = req.body;
+    member = await Circular.findByIdAndUpdate(req.params.updateId, {title, content }, {
+        new: true,
+        runValidators: true
+    });
+
+    res.status(200).json({ success: true, data: member, msg: 'Successfully updated' });
+    
+
+  } catch (error) {
+    // Send error response inside the catch block
+    res.status(400).json({ success: false, msg: error.message });
+  }
+});
+
+
+exports.deleteCircular = asyncHandler(async (req, res) => {
+  
+  const circular = await Circular.findByIdAndDelete(req.params.circularId);
+
+  if (!circular) {
+    return res.status(401).json({
+      success: false,
+      msg: 'Member not found.'
+    });
+  }
+
+  res.status(201).json({
+    success: true,
+    msg: 'Successfully Deleted',
+    data: circular
+  });
+});
+ 
+exports.getCircularById = asyncHandler(async (req, res) => {
+  const circular = await Circular.findById(req.params.circularId)
+  
+
+  res.json({
+    success: true,
+    data: circular,
+  });
+ 
+});

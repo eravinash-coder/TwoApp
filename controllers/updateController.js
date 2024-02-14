@@ -80,3 +80,72 @@ exports.getUpdate = async (req, res) => {
     res.status(500).send(error.message);
   }
 };
+
+exports.getAllUpdate = asyncHandler(async (req, res) => {
+  
+  const associationId = req.user.associationId;
+  console.log(associationId);
+  let update = await Update.find({associationId});
+
+ res.json({
+   success: true,
+   data: update,
+ });
+});
+
+exports.editUpdate = asyncHandler(async (req, res) => {
+  try {
+    
+    
+    let member = await Member.findById(req.params.updateId);
+
+    if (!member) {
+        return res.status(401).json({
+            success: false,
+            msg: 'Category not found.'
+        })
+    }
+    const { title, content } = req.body;
+    member = await Member.findByIdAndUpdate(req.params.updateId, {title, content }, {
+        new: true,
+        runValidators: true
+    });
+
+    res.status(200).json({ success: true, data: member, msg: 'Successfully updated' });
+    
+
+  } catch (error) {
+    // Send error response inside the catch block
+    res.status(400).json({ success: false, msg: error.message });
+  }
+});
+
+
+exports.deleteUpdate = asyncHandler(async (req, res) => {
+  
+  const update = await Update.findByIdAndDelete(req.params.updateId);
+
+  if (!update) {
+    return res.status(401).json({
+      success: false,
+      msg: 'Member not found.'
+    });
+  }
+
+  res.status(201).json({
+    success: true,
+    msg: 'Successfully Deleted',
+    data: update
+  });
+});
+ 
+exports.getUpdateById = asyncHandler(async (req, res) => {
+  const update = await Update.findById(req.params.updateId)
+  
+
+  res.json({
+    success: true,
+    data: update,
+  });
+ 
+});
