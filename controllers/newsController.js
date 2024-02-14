@@ -356,12 +356,9 @@ exports.getTodayNews = asyncHandler(async (req, res) => {
 });
 
 exports.getNews = asyncHandler(async (req, res) => {
-  
+  // Sort the news by the addedAt field in descending order
+  let news = await News.find({}).sort({ addedAt: -1 });
 
-  let news = await News.find({});
-
-
-  
   res.json({
     success: true,
     data: news,

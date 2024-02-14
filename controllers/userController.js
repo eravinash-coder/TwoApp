@@ -3,6 +3,7 @@ const generateToken = require('../utils/generateToken.js')
 const User = require('../models/userModel.js')
 const Association = require('../models/Association.js')
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 var crypto = require('crypto');
 var mailer = require('../utils/mailer');
 const { generateOtp, verifyOtp } = require('../utils/otp.js');
@@ -27,11 +28,12 @@ const authUser = asyncHandler(async (req, res) => {
         avatar: user.avatar,
         token: generateToken(user._id),
         redirectUrl: "/admin"
-      })
+      }) 
     } 
     else if (association && (await bcrypt.compare(password, association.password))){
+      const token = jwt.sign({ associationId: association._id }, 'userNewsApp');
       res.json({
-        token: generateToken(association._id),
+        token,
         redirectUrl: "/association"
       })
     }

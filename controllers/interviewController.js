@@ -62,7 +62,7 @@ exports.getAllInterview = asyncHandler(async (req, res) => {
 exports.getInterviews = asyncHandler(async (req, res) => {
 
 
-  let interviews = await Interview.find({});
+  let interviews = await Interview.find({}).sort({ createdAt: -1 });
 
 
 

@@ -2,10 +2,13 @@ const Member = require('../models/Member');
 const Association = require('../models/Association');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const asyncHandler = require("express-async-handler");
 
 exports.register = async (req, res) => {
   try {
-    const { associationId, name, email, password } = req.body;
+    const associationId = req.user.associationId;
+    console.log(associationId);
+    const { name, email, password } = req.body;
 
     const associationExists = await Association.findById(associationId);
     if (!associationExists) {
@@ -40,3 +43,78 @@ exports.login = async (req, res) => {
     res.status(401).send(error.message);
   }
 };
+
+exports.getMemberById = asyncHandler(async (req, res) => {
+  const member = await Member.findById(req.params.memberId)
+    
+
+  
+
+  res.json({
+    success: true,
+    data: member,
+  });
+ 
+});
+
+
+exports.getMember = asyncHandler(async (req, res) => {
+  
+   const associationId = req.user.associationId;
+   console.log(associationId);
+  let member = await Member.find({associationId});
+
+
+  
+  res.json({
+    success: true,
+    data: member,
+  });
+});
+
+exports.editMember = asyncHandler(async (req, res) => {
+  try {
+    
+    
+    let member = await Member.findById(req.params.memberId);
+
+    if (!member) {
+        return res.status(401).json({
+            success: false,
+            msg: 'Category not found.'
+        })
+    }
+    const { name, email, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    member = await Member.findByIdAndUpdate(req.params.memberId, {name, email, password: hashedPassword }, {
+        new: true,
+        runValidators: true
+    });
+
+    res.status(200).json({ success: true, data: member, msg: 'Successfully updated' });
+    
+
+  } catch (error) {
+    // Send error response inside the catch block
+    res.status(400).json({ success: false, msg: error.message });
+  }
+});
+
+
+exports.deleteMember = asyncHandler(async (req, res) => {
+  
+  const member = await Member.findByIdAndDelete(req.params.memberId);
+
+  if (!member) {
+    return res.status(401).json({
+      success: false,
+      msg: 'Member not found.'
+    });
+  }
+
+  res.status(201).json({
+    success: true,
+    msg: 'Successfully Deleted',
+    data: member
+  });
+});
