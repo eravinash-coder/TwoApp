@@ -2,10 +2,10 @@ const Circular = require('../models/Circular');
 const Member = require('../models/Member');
 const Association = require('../models/Association');
 const asyncHandler = require("express-async-handler");
-const Upload = require("../helpers/upload");
 
 exports.addCircular = asyncHandler(async (req, res) => {
-  const { title, content, associationId } = req.body;
+  const { title, content } = req.body;
+  const associationId = req.user.associationId
   try {
     const associationExists = await Association.findById(associationId);
     if (!associationExists) {
@@ -20,12 +20,11 @@ exports.addCircular = asyncHandler(async (req, res) => {
     if (!isAssociation) {
       return res.status(403).send('Unauthorized');
     }
-    const upload = await Upload.uploadFile(req.file.path);
+    
     var circular = new Circular({
       associationId,
       title,
       content,
-      urlToImage: upload.secure_url,
       addedAt: Date.now(),
     });
     var record = await circular.save();
