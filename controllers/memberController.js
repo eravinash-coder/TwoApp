@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const asyncHandler = require("express-async-handler");
 const excel = require('exceljs');
-const fs = require('fs');
+const multer = require('multer');
 
 exports.register = async (req, res) => {
   try {
@@ -120,17 +120,31 @@ exports.deleteMember = asyncHandler(async (req, res) => {
     data: member
   });
 });
+
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+const myUploadMiddleware = upload.single('excelFile');
+
+const runMiddleware = (req, res, fn) => {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (err) => {
+      if (err) reject(err);
+      resolve();
+    });
+  });
+};
 exports.addMemberBulk= asyncHandler(async (req, res) => {
   const associationId = req.user.associationId;
   try {
     
-    const filePath = req.file.path;
+    await runMiddleware(req, res, myUploadMiddleware);
 
-    // Read data from Excel file
     const workbook = new excel.Workbook();
-    await workbook.xlsx.readFile(filePath);
-    const worksheet = workbook.getWorksheet(1); // Assuming data is on the first worksheet
+    await workbook.xlsx.load(req.file.buffer);
+    const worksheet = workbook.getWorksheet(1);
     const data = [];
+
 
     for (let i = 2; i <= worksheet.rowCount; i++) {
       const row = worksheet.getRow(i);
@@ -160,7 +174,6 @@ exports.addMemberBulk= asyncHandler(async (req, res) => {
       await newMember.save();
       console.log(`Data inserted successfully for email: ${email}`);
     }
-    fs.unlinkSync(filePath);
     res.send('Data import complete');
   } catch (error) {
     console.error('Error importing data:', error);
