@@ -27,6 +27,7 @@ const interviewRoutes = require('./routes/interviewRoutes');
 const chaptersRoutes = require('./routes/chaptersRoutes');
 const boardsRoutes = require('./routes/boardsRoutes');
 const aboutRoutes = require('./routes/aboutRoutes');
+const luxuryRoutes = require('./routes/luxuryRoutes');
 const morgan = require('morgan');
 
 
@@ -65,6 +66,7 @@ app.use('/api/interview', interviewRoutes);
 app.use('/api/chapters', chaptersRoutes);
 app.use('/api/boards',boardsRoutes );
 app.use('/api/abouts', aboutRoutes);
+app.use('/api/luxury', luxuryRoutes);
 app.get('*', function(req, res){
   res.status(404).json({
     msg: "Api path not found."

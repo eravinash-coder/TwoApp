@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler')
 const generateToken = require('../utils/generateToken.js')
 const User = require('../models/userModel.js')
 const Association = require('../models/Association.js')
+const luxury = require('../models/Luxury.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 var crypto = require('crypto');
@@ -19,6 +20,7 @@ const authUser = asyncHandler(async (req, res) => {
 
     const user = await User.findOne({ email })
     const association = await Association.findOne({email});
+    const Luxury = await luxury.findOne({email});
 
     if (user && (await user.matchPassword(password))) {
       res.json({
@@ -35,6 +37,12 @@ const authUser = asyncHandler(async (req, res) => {
       res.json({
         token,
         redirectUrl: "/association"
+      })
+    }else if (Luxury && (await user.matchPassword(password))){
+      const token = jwt.sign({ luxuryId: Luxury._id }, 'userNewsApp');
+      res.json({
+        token,
+        redirectUrl: luxury.type
       })
     }
     else {
