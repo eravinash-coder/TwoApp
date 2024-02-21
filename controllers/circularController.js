@@ -25,6 +25,7 @@ exports.addCircular = asyncHandler(async (req, res) => {
       associationId,
       title,
       content,
+      urlToImage:"https://res.cloudinary.com/dotl3vxej/image/upload/v1708501724/xihgaqddqm9g1ldjk8cq.png",
       addedAt: Date.now(),
     });
     var record = await circular.save();
@@ -105,7 +106,7 @@ exports.editCircular = asyncHandler(async (req, res) => {
         })
     }
     const { title, content } = req.body;
-    circular = await Circular.findByIdAndUpdate(req.params.circularId, {title, content }, {
+    circular = await Circular.findByIdAndUpdate(req.params.circularId, {title, content ,urlToImage:"https://res.cloudinary.com/dotl3vxej/image/upload/v1708501724/xihgaqddqm9g1ldjk8cq.png" }, {
         new: true,
         runValidators: true
     });

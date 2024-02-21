@@ -139,26 +139,23 @@ exports.addMemberBulk= asyncHandler(async (req, res) => {
   try {
     
     await runMiddleware(req, res, myUploadMiddleware);
-
     const workbook = new excel.Workbook();
     await workbook.xlsx.load(req.file.buffer);
     const worksheet = workbook.getWorksheet(1);
     const data = [];
-
-
     for (let i = 2; i <= worksheet.rowCount; i++) {
       const row = worksheet.getRow(i);
-
-      const email = row.getCell(2).value;
+      const emails = row.getCell(2).value;
+      const email = emails.split(';')[0];
       const existingMember = await Member.findOne({ email });
 
       if (existingMember) {
-        console.log(`Skipping data with email ${email} as it already exists`);
+        
         continue; // Skip insertion if email already exists
       }
-
       const name = row.getCell(1).value;
-      const password = row.getCell(3).value;
+      const firstName = name.split(' ')[0];
+      const password = firstName+"@12345";
 
       // Hash the password
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -172,7 +169,7 @@ exports.addMemberBulk= asyncHandler(async (req, res) => {
       });
 
       await newMember.save();
-      console.log(`Data inserted successfully for email: ${email}`);
+      
     }
     res.send('Data import complete');
   } catch (error) {

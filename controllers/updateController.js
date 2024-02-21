@@ -26,6 +26,7 @@ exports.addUpdate = asyncHandler(async (req, res) => {
       associationId,
       title,
       content,
+      urlToImage:"https://res.cloudinary.com/dotl3vxej/image/upload/v1708500766/vlu3keydgttnlosim1vo.jpg",
       addedAt: Date.now(),
     });
     var record = await update.save();
@@ -106,7 +107,7 @@ exports.editUpdate = asyncHandler(async (req, res) => {
         })
     }
     const { title, content } = req.body;
-    update = await Update.findByIdAndUpdate(req.params.updateId, {title, content }, {
+    update = await Update.findByIdAndUpdate(req.params.updateId, {title, content , urlToImage:"https://res.cloudinary.com/dotl3vxej/image/upload/v1708500766/vlu3keydgttnlosim1vo.jpg" }, {
         new: true,
         runValidators: true
     });
