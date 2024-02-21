@@ -3,22 +3,22 @@ const bcrypt = require('bcryptjs');
 const luxurySchema = mongoose.Schema(
     {
         name: {
-            type: 'string',
+            type: 'String',
             required: true
         },
         email: {
-            type: 'string',
+            type: 'String',
             required: true,
             unique: true
         },
         type:{
-            type: 'string',
+            type: 'String',
             required: true,
             unique: true
 
         },
         password: {
-            type: 'string',
+            type: 'String',
             
             required: true
         },
