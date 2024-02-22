@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const Association = require('../models/Association');
 const Member = require('../models/Member');
+const Laxury = require('../models/Luxury');
 
 const authAssoMiddleware = async (req, res, next) => {
 
@@ -28,7 +29,14 @@ const authAssoMiddleware = async (req, res, next) => {
       }
       req.user = { role: 'member', memberId: decoded.memberId };
     }
+    if (decoded.luxuryId) {
+      const laxury = await Laxury.findById(decoded.luxuryId);
 
+      if (!laxury) {
+        return res.status(401).send('Unauthorized');
+      }
+      req.user = { role: 'luxury', laxuryId: decoded.luxuryId };
+    }
     next();
   } catch (error) {
     res.status(401).send('Unauthorized');

@@ -24,6 +24,7 @@ function runMiddleware(req, res, fn) {
 
 exports.addLaxuryHotel = asyncHandler(async (req, res) => {
   try {
+    const laxuryId = req.user.laxuryId;
     await runMiddleware(req, res, myUploadMiddleware);
 
     const { 
@@ -57,6 +58,7 @@ exports.addLaxuryHotel = asyncHandler(async (req, res) => {
     }
 
     const laxuryHotel = new LaxuryHotel({
+       laxuryId,
         name,
         title,
         address,
@@ -117,3 +119,113 @@ exports.getLaxuryHotel = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+exports.getAllLaxuryHotel = asyncHandler(async (req, res) => {
+  
+  const luxuryId = req.user.luxuryId;
+  console.log(luxuryId);
+  let laxuryHotel = await LaxuryHotel.find({luxuryId});
+
+ res.json({
+   success: true,
+   data: laxuryHotel,
+ });
+});
+
+exports.updateLaxuryHotel = asyncHandler(async (req, res) => {
+  try {
+    await runMiddleware(req, res, myUploadMiddleware);
+
+    const { 
+        name,
+        title,
+        address,
+        city,
+        country,
+        access,
+        amenities,
+        website } = req.body;
+    let imageObjects, home_imageObjects;
+
+    if (req.files && req.files['image']) {
+      imageObjects = await Promise.all(
+        req.files['image'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
+    }
+    if (req.files && req.files['home_image']) {
+      home_imageObjects = await Promise.all(
+        req.files['home_image'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
+    }
+
+    const laxuryHotelId = req.params.laxuryHotelId; // Assuming you're passing hotel ID in the URL
+    const laxuryHotel = await LaxuryHotel.findById(laxuryHotelId);
+
+    if (!laxuryHotel) {
+      return res.status(404).json({ message: 'Hotel not found' });
+    }
+
+    // Update hotel properties
+    laxuryHotel.name = name;
+    laxuryHotel.title = title;
+    laxuryHotel.address = address;
+    laxuryHotel.city = city;
+    laxuryHotel.country = country;
+    laxuryHotel.access = access;
+    laxuryHotel.amenities = amenities;
+    laxuryHotel.website = website;
+    laxuryHotel.image_url = imageObjects;
+    laxuryHotel.home_url = home_imageObjects;
+
+    await laxuryHotel.save();
+
+    res.json({
+      message: 'Hotel updated successfully',
+      data: laxuryHotel,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: 'Internal server error',
+    });
+  }
+});
+
+
+exports.deleteLaxuryHotel = asyncHandler(async (req, res) => {
+  
+  const laxuryHotel = await LaxuryHotel.findByIdAndDelete(req.params.laxuryHotelId);
+
+  if (!laxuryHotel) {
+    return res.status(401).json({
+      success: false,
+      msg: 'Member not found.'
+    });
+  }
+
+  res.status(201).json({
+    success: true,
+    msg: 'Successfully Deleted',
+    data: laxuryHotel
+  });
+});
+ 
+exports.getLaxuryHotelById = asyncHandler(async (req, res) => {
+  const laxuryHotel = await LaxuryHotel.findById(req.params.laxuryHotelId)
+  
+
+  res.json({
+    success: true,
+    data: laxuryHotel,
+  });
+ 
+});

@@ -1,15 +1,88 @@
-const DMC = require('../models/dmcModel');
+const DMC = require('../models/dmc');
 
-// Create DMC
-exports.createDMC = async (req, res) => {
+const asyncHandler = require("express-async-handler");
+const multer = require('multer');
+
+const handleUpload = require('../helpers/upload')
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+const myUploadMiddleware = upload.fields([
+  { name: 'image', maxCount: 10 },
+  { name: 'document', maxCount: 10 }
+]);
+
+
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
+}
+
+exports.addDMC = asyncHandler(async (req, res) => {
   try {
-    const dmc = new DMC(req.body);
-    await dmc.save();
-    res.status(201).json(dmc);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+
+    await runMiddleware(req, res, myUploadMiddleware);
+
+    const {
+      name,
+      cname,
+      email,
+      phone,
+      address,
+      specialization, } = req.body;
+    let imageObjects, home_imageObjects;
+
+    if (req.files && req.files['image']) {
+      imageObjects = await Promise.all(
+        req.files['image'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
+    }
+    if (req.files && req.files['home_image']) {
+      home_imageObjects = await Promise.all(
+        req.files['home_image'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
+    }
+
+    const dmc = new DMC({
+
+      name,
+      cname,
+      email,
+      phone,
+      address,
+      specialization,
+      photo: imageObjects,
+      document: home_imageObjects
+
+
+    });
+
+     const Dmc= await dmc.save();
+
+    res.json({
+      message: 'Upload successful',
+      data: Dmc,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: 'Internal server error',
+    });
   }
-};
+});
 
 // Get all DMCs
 exports.getAllDMCs = async (req, res) => {

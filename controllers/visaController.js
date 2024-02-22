@@ -1,7 +1,7 @@
 const Visa = require('../models/visa');
 const asyncHandler = require("express-async-handler");
 const multer = require('multer');
-
+const { send } = require('../utils/mailer');
 const handleUpload = require('../helpers/upload')
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -182,11 +182,17 @@ exports.addVisa = asyncHandler(async (req, res) => {
 
     });
 
-    await visa.save();
+    const savedVisa = await visa.save();
+    if (savedVisa) {
+      const to = 'infotravelworldonline@gmail.com'; // Set the recipient's email address
+      const subject = 'New Visa Request';
+      const html = `<p>The visa details have been successfully saved:</p><p>${JSON.stringify(savedVisa)}</p>`;
+      await send(to, subject, html);
+    }
 
     res.json({
       message: 'Upload successful',
-      data: visa,
+      data: savedVisa,
     });
   } catch (error) {
     console.log(error);

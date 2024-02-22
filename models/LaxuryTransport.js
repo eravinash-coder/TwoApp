@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 
 const LaxuryTransportSchema = new mongoose.Schema({
-
+    laxuryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Luxury' },
     fname: String,
-
     lname: String,
 
     phone: String,
