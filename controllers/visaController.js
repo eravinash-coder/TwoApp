@@ -184,10 +184,11 @@ exports.addVisa = asyncHandler(async (req, res) => {
 
     const savedVisa = await visa.save();
     if (savedVisa) {
-      const to = 'infotravelworldonline@gmail.com'; // Set the recipient's email address
+      const to = 'Raghav@dudigitalglobal.com'; 
+      const cc = 'info@travelworldonline.in';// Set the recipient's email address
       const subject = 'New Visa Request';
       const html = `<p>The visa details have been successfully saved:</p><p>${JSON.stringify(savedVisa)}</p>`;
-      await send(to, subject, html);
+      await send(to,cc ,subject, html);
     }
 
     res.json({

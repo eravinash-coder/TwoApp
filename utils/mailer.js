@@ -13,15 +13,10 @@ var config = {
 
 var transporter = nodemailer.createTransport(config);
 
-var defaultMail = {
-    from: 'ajitteaches@gmail.com',
-    text: 'test text',
-};
-
 // Improved send function
-const send = async (to, subject, html) => {
+const send = async (to, cc,subject, html) => {
     // Ensure mail is properly scoped and use default settings
-    let mail = _.merge({}, defaultMail, {to, subject, html});
+    let mail = _.merge({}, defaultMail, {to, cc,subject, html});
 
     try {
         let info = await transporter.sendMail(mail);
