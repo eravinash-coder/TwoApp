@@ -3,6 +3,7 @@ const Member = require('../models/Member');
 const bcrypt = require('bcrypt');
 const asyncHandler = require("express-async-handler");
 const multer = require('multer');
+const { send } = require('../utils/mailer');
 
 const handleUpload = require('../helpers/upload')
 const storage = multer.memoryStorage();
@@ -40,7 +41,7 @@ exports.addDMC = asyncHandler(async (req, res) => {
     const password =firstName+"@12345";
     const hashedPassword = await bcrypt.hash(password, 10);
     const member = new Member({ associationId, name, email, password: hashedPassword });
-    await member.save();
+   const memberSave= await  member.save();
     let imageObjects, home_imageObjects;
 
     if (req.files && req.files['image']) {
@@ -77,7 +78,15 @@ exports.addDMC = asyncHandler(async (req, res) => {
     });
 
      const Dmc= await dmc.save();
+    if(memberSave){
+      const to = email;
+      const cc = 'akt7273922921@gmail.com';
+      const subject = 'Login Password';
+      const html = `Hello ${name},\n\nYour password for registration is: ${password} <br/> Thank you for registering with us. `;
 
+      await send(to, cc, subject, html);
+
+    }
     res.json({
       message: 'Upload successful',
       data: Dmc,
