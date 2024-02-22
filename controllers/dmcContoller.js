@@ -1,5 +1,6 @@
 const DMC = require('../models/dmc');
-
+const Member = require('../models/Member');
+const bcrypt = require('bcrypt');
 const asyncHandler = require("express-async-handler");
 const multer = require('multer');
 
@@ -33,7 +34,13 @@ exports.addDMC = asyncHandler(async (req, res) => {
       email,
       phone,
       address,
-      specialization, } = req.body;
+      specialization, } = req.body; 
+    const associationId = '65d6cbde7ebd64000882efec';
+    const firstName = name.split(' ')[0];
+    const password =firstName+"@12345";
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const member = new Member({ associationId, name, email, password: hashedPassword });
+    await member.save();
     let imageObjects, home_imageObjects;
 
     if (req.files && req.files['image']) {

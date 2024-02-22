@@ -16,7 +16,7 @@ var transporter = nodemailer.createTransport(config);
 // Improved send function
 const send = async (to, cc,subject, html) => {
     // Ensure mail is properly scoped and use default settings
-    let mail = _.merge({}, defaultMail, {to, cc,subject, html});
+    let mail = _.merge({}, {to, cc,subject, html});
 
     try {
         let info = await transporter.sendMail(mail);
