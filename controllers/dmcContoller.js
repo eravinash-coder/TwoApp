@@ -25,7 +25,6 @@ function runMiddleware(req, res, fn) {
 
 exports.addDMC = asyncHandler(async (req, res) => {
   try {
-
     await runMiddleware(req, res, myUploadMiddleware);
 
     const {
@@ -46,9 +45,9 @@ exports.addDMC = asyncHandler(async (req, res) => {
         })
       );
     }
-    if (req.files && req.files['home_image']) {
+    if (req.files && req.files['document']) {
       home_imageObjects = await Promise.all(
-        req.files['home_image'].map(async (file) => {
+        req.files['document'].map(async (file) => {
           const b64 = Buffer.from(file.buffer).toString('base64');
           const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
           return handleUpload(dataURI);
