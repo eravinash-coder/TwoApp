@@ -14,7 +14,7 @@ const luxurySchema = mongoose.Schema(
         type:{
             type: 'String',
             required: true,
-            unique: true
+           
 
         },
         password: {
