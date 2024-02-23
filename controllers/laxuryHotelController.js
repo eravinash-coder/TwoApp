@@ -23,6 +23,7 @@ function runMiddleware(req, res, fn) {
 }
 
 exports.addLaxuryHotel = asyncHandler(async (req, res) => {
+  console.log(req.body);
   try {
     const laxuryId = req.user.laxuryId;
     await runMiddleware(req, res, myUploadMiddleware);
@@ -123,9 +124,9 @@ exports.getLaxuryHotel = async (req, res) => {
 
 exports.getAllLaxuryHotel = asyncHandler(async (req, res) => {
   
-  const luxuryId = req.user.luxuryId;
-  console.log(luxuryId);
-  let laxuryHotel = await LaxuryHotel.find({luxuryId});
+  const laxuryId = req.user.laxuryId;
+
+  let laxuryHotel = await LaxuryHotel.find({laxuryId});
 
  res.json({
    success: true,
@@ -134,6 +135,7 @@ exports.getAllLaxuryHotel = asyncHandler(async (req, res) => {
 });
 
 exports.updateLaxuryHotel = asyncHandler(async (req, res) => {
+  console.log(req.body);
   try {
     await runMiddleware(req, res, myUploadMiddleware);
 

@@ -29,6 +29,7 @@ const authAssoMiddleware = async (req, res, next) => {
       }
       req.user = { role: 'member', memberId: decoded.memberId };
     }
+    console.log(decoded.luxuryId);
     if (decoded.luxuryId) {
       const laxury = await Laxury.findById(decoded.luxuryId);
 
