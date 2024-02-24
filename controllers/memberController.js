@@ -12,6 +12,15 @@ exports.register = async (req, res) => {
     console.log(associationId);
     const { name, email, password } = req.body;
 
+    const memberExists = await Member.findOne({ email })
+
+    if (memberExists) {
+      return res.status(400).json({
+        success: false,
+        msg: 'Entered email id already registered with us. Login to continue'
+      })
+    }
+
     const associationExists = await Association.findById(associationId);
     if (!associationExists) {
       return res.status(404).send('Association not found');
@@ -29,7 +38,7 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { associationId, email, password } = req.body;
-   
+
     const member = await Member.findOne({ email });
     if (associationId && String(member.associationId) !== associationId) {
       throw new Error('Member does not belong to the specified association');
@@ -40,7 +49,7 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign({ memberId: member._id }, 'userNewsApp');
-    res.send({ token ,member});
+    res.send({ token, member });
   } catch (error) {
     res.status(401).send(error.message);
   }
@@ -48,26 +57,26 @@ exports.login = async (req, res) => {
 
 exports.getMemberById = asyncHandler(async (req, res) => {
   const member = await Member.findById(req.params.memberId)
-    
 
-  
+
+
 
   res.json({
     success: true,
     data: member,
   });
- 
+
 });
 
 
 exports.getMember = asyncHandler(async (req, res) => {
-  
-   const associationId = req.user.associationId;
-   console.log(associationId);
-  let member = await Member.find({associationId});
+
+  const associationId = req.user.associationId;
+  console.log(associationId);
+  let member = await Member.find({ associationId });
 
 
-  
+
   res.json({
     success: true,
     data: member,
@@ -76,25 +85,25 @@ exports.getMember = asyncHandler(async (req, res) => {
 
 exports.editMember = asyncHandler(async (req, res) => {
   try {
-    
-    
+
+
     let member = await Member.findById(req.params.memberId);
 
     if (!member) {
-        return res.status(401).json({
-            success: false,
-            msg: 'Category not found.'
-        })
+      return res.status(401).json({
+        success: false,
+        msg: 'Category not found.'
+      })
     }
     const { name, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    member = await Member.findByIdAndUpdate(req.params.memberId, {name, email, password: hashedPassword }, {
-        new: true,
-        runValidators: true
+    member = await Member.findByIdAndUpdate(req.params.memberId, { name, email, password: hashedPassword }, {
+      new: true,
+      runValidators: true
     });
 
     res.status(200).json({ success: true, data: member, msg: 'Successfully updated' });
-    
+
 
   } catch (error) {
     // Send error response inside the catch block
@@ -104,7 +113,7 @@ exports.editMember = asyncHandler(async (req, res) => {
 
 
 exports.deleteMember = asyncHandler(async (req, res) => {
-  
+
   const member = await Member.findByIdAndDelete(req.params.memberId);
 
   if (!member) {
@@ -134,10 +143,10 @@ const runMiddleware = (req, res, fn) => {
     });
   });
 };
-exports.addMemberBulk= asyncHandler(async (req, res) => {
+exports.addMemberBulk = asyncHandler(async (req, res) => {
   const associationId = req.user.associationId;
   try {
-    
+
     await runMiddleware(req, res, myUploadMiddleware);
     const workbook = new excel.Workbook();
     await workbook.xlsx.load(req.file.buffer);
@@ -150,12 +159,12 @@ exports.addMemberBulk= asyncHandler(async (req, res) => {
       const existingMember = await Member.findOne({ email });
 
       if (existingMember) {
-        
+
         continue; // Skip insertion if email already exists
       }
       const name = row.getCell(1).value;
       const firstName = name.split(' ')[0];
-      const password = firstName+"@12345";
+      const password = firstName + "@12345";
 
       // Hash the password
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -169,7 +178,7 @@ exports.addMemberBulk= asyncHandler(async (req, res) => {
       });
 
       await newMember.save();
-      
+
     }
     res.send('Data import complete');
   } catch (error) {

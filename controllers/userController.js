@@ -36,6 +36,9 @@ const authUser = asyncHandler(async (req, res) => {
     else if (association && (await bcrypt.compare(password, association.password))){
       const token = jwt.sign({ associationId: association._id }, 'userNewsApp');
       res.json({
+        name: association.name,
+        email: association.email,
+        avatar: association.image[0],
         token,
         redirectUrl: "/association"
       })
