@@ -57,7 +57,7 @@ exports.updateUFFTAById = async (req, res) => {
       await send(to, cc, subject, html);
 
     }
-    res.json(uffta);
+    res.json(memberSave);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
