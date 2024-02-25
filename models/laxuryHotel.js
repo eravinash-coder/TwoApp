@@ -8,6 +8,8 @@ const laxuryHotelSchema = new mongoose.Schema({
     city: String,
     country: String,
     access: String,
+    information:String,
+    video:String,
     amenities: [String],
     image_url: [Object],
     home_url: [Object],

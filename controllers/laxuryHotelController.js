@@ -35,6 +35,8 @@ exports.addLaxuryHotel = asyncHandler(async (req, res) => {
         city,
         country,
         access,
+        information,
+        video,
         amenities,
         website } = req.body;
       let imageObjects,home_imageObjects;
@@ -66,10 +68,12 @@ exports.addLaxuryHotel = asyncHandler(async (req, res) => {
         city,
         country,
         access,
+        information,
         amenities,
+        video,
         website,
         image_url:imageObjects,
-        home_url:home_imageObjects
+        home_url: home_imageObjects
 
 
     });
