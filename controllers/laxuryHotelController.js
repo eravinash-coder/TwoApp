@@ -107,6 +107,8 @@ exports.getLaxuryHotel = async (req, res) => {
       amenities: hotel.amenities,
       image_url: hotel.image_url,
       website: hotel.website,
+      information: hotel.information,
+      video: hotel.video,
     }));
 
     const homeimgurl = hotels.map(hotel => ({
@@ -151,7 +153,9 @@ exports.updateLaxuryHotel = asyncHandler(async (req, res) => {
         country,
         access,
         amenities,
-        website } = req.body;
+        website,
+        information,
+        video } = req.body;
     let imageObjects, home_imageObjects;
 
     if (req.files && req.files['image']) {
@@ -189,6 +193,8 @@ exports.updateLaxuryHotel = asyncHandler(async (req, res) => {
     laxuryHotel.access = access;
     laxuryHotel.amenities = amenities;
     laxuryHotel.website = website;
+    laxuryHotel.information = information;
+    laxuryHotel.video = video;
     laxuryHotel.image_url = imageObjects;
     laxuryHotel.home_url = home_imageObjects;
 
