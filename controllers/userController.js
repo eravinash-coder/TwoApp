@@ -21,7 +21,6 @@ const authUser = asyncHandler(async (req, res) => {
     const user = await User.findOne({ email })
     const association = await Association.findOne({email});
     const Luxury = await luxury.findOne({email});
-    console.log(Luxury);
 
     if (user && (await user.matchPassword(password))) {
       res.json({
@@ -45,6 +44,9 @@ const authUser = asyncHandler(async (req, res) => {
     }else if (Luxury && (await Luxury.matchPassword(password))){
       const token = jwt.sign({ luxuryId: Luxury._id }, 'userNewsApp');
       res.json({
+        name: Luxury.name,
+        email: Luxury.email,
+        avatar: Luxury.avatar[0],
         token,
         redirectUrl: Luxury.type
       })

@@ -9,7 +9,6 @@ const multer = require('multer');
 exports.register = async (req, res) => {
   try {
     const associationId = req.user.associationId;
-    console.log(associationId);
     const { name, email, password } = req.body;
 
     const memberExists = await Member.findOne({ email })
@@ -72,7 +71,7 @@ exports.getMemberById = asyncHandler(async (req, res) => {
 exports.getMember = asyncHandler(async (req, res) => {
 
   const associationId = req.user.associationId;
-  console.log(associationId);
+  
   let member = await Member.find({ associationId });
 
 
