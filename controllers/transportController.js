@@ -111,6 +111,46 @@ exports.getTransport = async (req, res) => {
     }
 };
 
+exports.getAllTransports = async (req, res) => { 
+    try {
+        const associationId = req.params.associationId;
+        const memberId = req.user.memberId;
+        const associationExists = await Association.findById(associationId);
+        if (!associationExists) {
+            return res.status(400).send('Association not found');
+        }
+
+        // Authentication middleware will verify if the user is a member of the association
+        // This check is simplified, and you might want to use a proper middleware
+        // Check authMiddleware.js for the actual middleware
+        const isMember = req.user && req.user.role === 'member';
+
+        if (!isMember) {
+            return res.status(403).send('Unauthorized');
+        }
+
+        const Transports = await Transport.find({ dealType: '0' });
+
+
+        const modifiedtransport = [];
+
+        // Loop through each hotel and check if the member is in its favorites
+        for (const transport of Transports) {
+            const isFav = transport.favorites.includes(memberId);
+            // Flatten the structure
+            const responseData = {
+                ...transport.toObject(),
+                isFav,
+            };
+            modifiedtransport.push(responseData);
+        }
+
+        res.send([{Transport:modifiedtransport}]);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
+
 exports.getMyTransports = async (req, res) => {
     try {
 

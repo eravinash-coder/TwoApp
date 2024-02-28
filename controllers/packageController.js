@@ -115,6 +115,45 @@ exports.getPackages = async (req, res) => {
     }
 };
 
+exports.getAllPackages = async (req, res) => { 
+    try {
+        const associationId = req.params.associationId;
+        const memberId = req.user.memberId;
+        const associationExists = await Association.findById(associationId);
+        if (!associationExists) {
+            return res.status(400).send('Association not found');
+        }
+
+        // Authentication middleware will verify if the user is a member of the association
+        // This check is simplified, and you might want to use a proper middleware
+        // Check authMiddleware.js for the actual middleware
+        const isMember = req.user && req.user.role === 'member';
+
+        if (!isMember) {
+            return res.status(403).send('Unauthorized');
+        }
+
+        const Packages = await Package.find({ dealType: '0' });
+
+        const modifiedPackage = [];
+
+        // Loop through each hotel and check if the member is in its favorites
+        for (const package of Packages) {
+            const isFav = package.favorites.includes(memberId);
+            // Flatten the structure
+            const responseData = {
+                ...package.toObject(),
+                isFav,
+            };
+            modifiedPackage.push(responseData);
+        }
+
+        res.send([{Packages:modifiedPackage}]);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+};
+
 exports.getMyPackages = async (req, res) => {
     try {
 

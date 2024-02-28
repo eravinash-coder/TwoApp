@@ -6,6 +6,7 @@ const authassoMiddleware = require('../middleware/authAssoMiddleware');
 
 
 router.post('/addtransport', authassoMiddleware,  transportController.addtransport);
+router.get('/GetAllTransport/:associationId', authassoMiddleware,  transportController.getAllTransports);
 router.get('/GetTransport/:associationId', authassoMiddleware,  transportController.getTransport);
 router.get('/mytransports', authassoMiddleware, transportController.getMyTransports);
 router.put('/updateTransport/:TransportId', authassoMiddleware, transportController.updateTransport);

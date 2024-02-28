@@ -3,6 +3,7 @@ const Hotel = require('../models/hotel');
 const Member = require('../models/Member');
 const Association = require('../models/Association');
 const asyncHandler = require("express-async-handler");
+const hotel = require('../models/hotel');
 
 
 exports.addHotel = asyncHandler(async (req, res) => {
@@ -113,6 +114,46 @@ exports.getHotel = async (req, res) => {
         res.status(500).send(error.message);
     }
 };
+exports.getAllHotels = async (req, res) => { 
+    try {
+        const associationId = req.params.associationId;
+        const memberId = req.user.memberId;
+        const associationExists = await Association.findById(associationId);
+        if (!associationExists) {
+            return res.status(400).send('Association not found');
+        }
+
+        // Authentication middleware will verify if the user is a member of the association
+        // This check is simplified, and you might want to use a proper middleware
+        // Check authMiddleware.js for the actual middleware
+        const isMember = req.user && req.user.role === 'member';
+
+        if (!isMember) {
+            return res.status(403).send('Unauthorized');
+        }
+
+        const Hotels = await Hotel.find({  dealType: '0'  });
+
+
+        const modifiedHotels = [];
+
+        // Loop through each hotel and check if the member is in its favorites
+        for (const hotel of Hotels) {
+            const isFav = hotel.favorites.includes(memberId);
+            // Flatten the structure
+            const responseData = {
+                ...hotel.toObject(),
+                isFav,
+            };
+            modifiedHotels.push(responseData);
+        }
+
+        res.send([{hotel:modifiedHotels}]);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
+
 
 exports.getMyHotels = async (req, res) => {
     try {
