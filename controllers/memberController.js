@@ -193,7 +193,7 @@ exports.addMemberBulk = asyncHandler(async (req, res) => {
 
 
 
-exports.post('/send-notification', async (req, res) => {
+exports.sendNotification('/send-notification', async (req, res) => {
   const { associationId, title,body } = req.body;
 
   try {
