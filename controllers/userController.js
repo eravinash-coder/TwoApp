@@ -17,6 +17,7 @@ const authUser = asyncHandler(async (req, res) => {
 
   try {
     const { email, password } = req.body
+    console.log(req.body);
 
     const user = await User.findOne({ email })
     const association = await Association.findOne({email});
