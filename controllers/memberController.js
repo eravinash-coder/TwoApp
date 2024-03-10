@@ -36,7 +36,7 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { associationId, email, password } = req.body;
+    const { associationId, email, password , FmcToken} = req.body;
     console.log(req.body);
     const member = await Member.findOne({ email });
     if (associationId && String(member.associationId) !== associationId) {
@@ -46,6 +46,11 @@ exports.login = async (req, res) => {
     if (!member || !(await bcrypt.compare(password, member.password))) {
       throw new Error('Invalid login credentials');
     }
+    if (FmcToken && FmcToken !== member.FmcToken) {
+      member.FmcToken = FmcToken;
+      await member.save();
+    }
+
 
     const token = jwt.sign({ memberId: member._id }, 'userNewsApp');
     res.send({ token, member });
@@ -183,5 +188,52 @@ exports.addMemberBulk = asyncHandler(async (req, res) => {
   } catch (error) {
     console.error('Error importing data:', error);
     res.status(500).send('Error importing data');
+  }
+});
+
+
+
+exports.post('/send-notification', async (req, res) => {
+  const { associationId, title,body } = req.body;
+
+  try {
+    // Find all members with the given associationId
+    const members = await Member.find({ associationId });
+
+    if (!members || members.length === 0) {
+      return res.status(404).send('No members found for the association');
+    }
+
+    // Prepare notification message
+    const message = {
+      notification: {
+        title,
+        body
+      },
+    };
+
+    // Send notifications to each member's device
+    const responses = await Promise.all(
+      members.map(async (member) => {
+        if (member.FmcToken) {
+          message.token = member.FmcToken;
+          return admin.messaging().send(message);
+        }
+      })
+    );
+
+    // Handle responses
+    responses.forEach((response, index) => {
+      if (response) {
+        console.log('Successfully sent message to member:', members[index]._id);
+      } else {
+        console.error('Failed to send message to member:', members[index]._id);
+      }
+    });
+
+    res.status(200).send('Notifications sent successfully');
+  } catch (error) {
+    console.error('Error sending notifications:', error);
+    res.status(500).send('Error sending notifications');
   }
 });
