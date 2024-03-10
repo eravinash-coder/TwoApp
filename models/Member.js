@@ -7,7 +7,8 @@ const memberSchema = new mongoose.Schema({
   password: String,
   favoritesHotel:[{type: mongoose.Schema.Types.ObjectId,ref: 'Hotel'}],
   favoritesTransport:[{type: mongoose.Schema.Types.ObjectId,ref: 'Transport'}],
-  favoritesPackage:[{type: mongoose.Schema.Types.ObjectId,ref: 'Package'}]
+  favoritesPackage:[{type: mongoose.Schema.Types.ObjectId,ref: 'Package'}],
+  FmcToken: String
 
 });
 

@@ -39,6 +39,7 @@ const userSchema = mongoose.Schema(
         },
         activeToken: String,
         activeExpires: Date,
+        
     }
 )
 

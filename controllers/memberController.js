@@ -37,7 +37,7 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { associationId, email, password } = req.body;
-
+    console.log(req.body);
     const member = await Member.findOne({ email });
     if (associationId && String(member.associationId) !== associationId) {
       throw new Error('Member does not belong to the specified association');

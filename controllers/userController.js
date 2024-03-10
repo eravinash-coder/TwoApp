@@ -16,8 +16,8 @@ const { generateOtp, verifyOtp } = require('../utils/otp.js');
 const authUser = asyncHandler(async (req, res) => {
 
   try {
-    const { email, password } = req.body
-    console.log(req.body);
+    const { email, password  } = req.body
+    
 
     const user = await User.findOne({ email })
     const association = await Association.findOne({email});
@@ -68,7 +68,6 @@ const authUser = asyncHandler(async (req, res) => {
 // @route   POST /api/users
 // @access  Public
 const registerUser = asyncHandler(async (req, res, next) => {
-  console.log(req.body)
 
   const { name, email, password } = req.body
   const userExists = await User.findOne({ email })
