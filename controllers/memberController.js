@@ -5,6 +5,9 @@ const bcrypt = require('bcrypt');
 const asyncHandler = require("express-async-handler");
 const excel = require('exceljs');
 const multer = require('multer');
+const admin = require('firebase-admin');
+
+
 
 exports.register = async (req, res) => {
   try {
@@ -191,10 +194,15 @@ exports.addMemberBulk = asyncHandler(async (req, res) => {
   }
 });
 
+const serviceAccount = require('../utils/serviceAccountKey.json'); // Path to your Firebase service account key file
 
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 exports.sendNotification= asyncHandler(async (req, res) => {
-  const { associationId, title,body } = req.body;
+  const { title,body } = req.body;
+  const associationId = req.user.associationId;
 
   try {
     // Find all members with the given associationId
@@ -223,13 +231,13 @@ exports.sendNotification= asyncHandler(async (req, res) => {
     );
 
     // Handle responses
-    responses.forEach((response, index) => {
-      if (response) {
-        console.log('Successfully sent message to member:', members[index]._id);
-      } else {
-        console.error('Failed to send message to member:', members[index]._id);
-      }
-    });
+    // responses.forEach((response, index) => {
+    //   if (response) {
+    //     console.log('Successfully sent message to member:', members[index]._id);
+    //   } else {
+    //     console.error('Failed to send message to member:', members[index]._id);
+    //   }
+    // });
 
     res.status(200).send('Notifications sent successfully');
   } catch (error) {
