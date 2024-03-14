@@ -30,6 +30,7 @@ const aboutRoutes = require('./routes/aboutRoutes');
 const luxuryRoutes = require('./routes/luxuryRoutes');
 const dmcRoutes = require('./routes/dmcRoutes');
 const ufftaRoutes = require('./routes/ufftaRoutes');
+const hotelBuyerRoutes = require('./routes/hotelBuyerRoutes');
 const morgan = require('morgan');
 
 
@@ -70,6 +71,7 @@ app.use('/api/boards',boardsRoutes );
 app.use('/api/abouts', aboutRoutes);
 app.use('/api/luxury', luxuryRoutes);
 app.use('/api/', dmcRoutes);
+app.use('/api/HotelBuyer', hotelBuyerRoutes);
 app.use('/api/uffta', ufftaRoutes);
 
 app.get('*', function(req, res){
