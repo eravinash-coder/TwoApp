@@ -129,7 +129,7 @@ exports.getAllTransports = async (req, res) => {
             return res.status(403).send('Unauthorized');
         }
 
-        const Transports = await Transport.find({ dealType: '0' });
+        const Transports = await Transport.find();
 
 
         const modifiedtransport = [];
