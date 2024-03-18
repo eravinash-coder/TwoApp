@@ -245,3 +245,29 @@ exports.sendNotification= asyncHandler(async (req, res) => {
     res.status(500).send('Error sending notifications');
   }
 });
+
+exports.forgotPassword = asyncHandler(async (req, res) => {
+  try {
+
+    const { email, associationId } = req.body;
+
+    const memberExists = await Member.findOne({ associationId, email });
+    if (!memberExists) {
+      return res.status(400).json({
+        success: false,
+        msg: 'Entered email id Not registered with this association'
+      });
+    }
+    const password  = memberExists.name + "@12345"
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const _id = memberExists._id;
+    const member = await Member.findByIdAndUpdate(_id, {password:hashedPassword},{ new: true });
+    res.status(200).json({
+      success: true,
+      msg: 'Reset password email sent',
+      data:member
+    });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});

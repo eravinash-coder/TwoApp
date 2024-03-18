@@ -11,6 +11,7 @@ router.get('/getById/:memberId',memberController.getMemberById);
 router.put('/editMember/:memberId',memberController.editMember);
 router.delete('/deleteMember/:memberId',memberController.deleteMember);
 router.post('/sendNotification',authassoMiddleware,memberController.sendNotification);
+router.put('/forgotPassword',memberController.forgotPassword);
 
 
 
