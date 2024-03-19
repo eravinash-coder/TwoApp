@@ -34,6 +34,8 @@ const hotelBuyerRoutes = require('./routes/hotelBuyerRoutes');
 const transportBuyerRoutes = require('./routes/transportBuyerRoutes');
 const packageBuyerRoutes = require('./routes/packageBuyerRoutes');
 const adRoutes = require('./routes/AdRoutes');
+const insurenceRoutes = require('./routes/insurenceRoutes');
+
 const morgan = require('morgan');
 
 
@@ -79,6 +81,7 @@ app.use('/api/TransportBuyer', transportBuyerRoutes);
 app.use('/api/PackageBuyer', packageBuyerRoutes);
 app.use('/api/uffta', ufftaRoutes);
 app.use('/api/ads', adRoutes);
+app.use('/api/insurence', insurenceRoutes);
 
 app.get('*', function(req, res){
   res.status(404).json({

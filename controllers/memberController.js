@@ -6,6 +6,7 @@ const asyncHandler = require("express-async-handler");
 const excel = require('exceljs');
 const multer = require('multer');
 const admin = require('firebase-admin');
+const { send } = require('../utils/mailer');
 
 
 
@@ -258,10 +259,20 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
         msg: 'Entered email id Not registered with this association'
       });
     }
-    const password  = memberExists.name + "@12345"
+    const name = memberExists.name;
+    const firstName = name.split(' ')[0];
+    const password = firstName+"@12345";
     const hashedPassword = await bcrypt.hash(password, 10);
     const _id = memberExists._id;
     const member = await Member.findByIdAndUpdate(_id, {password:hashedPassword},{ new: true });
+    if (member) {
+      const to = email;
+      const cc = 'akt7273922921@gmail.com';
+      const subject = 'Forgot Password';
+      const html = `Hello ${name},\n\nYour password for Login is: ${password} <br/> Thank you for registering with us. `;
+
+      await send(to, cc, subject, html);
+    }
     res.status(200).json({
       success: true,
       msg: 'Reset password email sent',
