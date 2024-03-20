@@ -8,6 +8,9 @@ var config = {
     auth: {
         user:'kumaravnish284@gmail.com', // Defined in .env
         pass: 'ctmq cdzk uaqn aful'  // Defined in .env
+    },
+    tls: {
+        rejectUnauthorized: false // Accept self-signed certificates
     }
 };
 
