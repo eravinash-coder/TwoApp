@@ -261,7 +261,7 @@ exports.addVisa = asyncHandler(async (req, res) => {
 
       const html = `<p>The visa details have been successfully saved:</p>${formattedVisaDetails}`;
 
-      await send(to, cc, subject, html);
+      await send(to, subject, html);
     }
 
 

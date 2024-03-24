@@ -84,7 +84,7 @@ exports.addDMC = asyncHandler(async (req, res) => {
       const subject = 'Login Password';
       const html = `Hello ${name},\n\nYour password for registration is: ${password} <br/> Thank you for registering with us. `;
 
-      await send(to, cc, subject, html);
+      await send(to, subject, html);
 
     }
     res.json({

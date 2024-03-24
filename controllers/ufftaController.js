@@ -50,11 +50,10 @@ exports.updateUFFTAById = async (req, res) => {
     const memberSave= await  member.save();
     if(memberSave){
       const to = email;
-      const cc = 'akt7273922921@gmail.com';
       const subject = 'Login Password';
       const html = `Hello ${name},\n\nYour password for registration is: ${password} <br/> Thank you for registering with us. `;
 
-      await send(to, cc, subject, html);
+      await send(to,  subject, html);
 
     }
     res.json(memberSave);

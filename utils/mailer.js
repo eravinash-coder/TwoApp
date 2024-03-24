@@ -6,8 +6,8 @@ var config = {
     host: 'smtp.gmail.com',
     port: 587,
     auth: {
-        user:'kumaravnish284@gmail.com', // Defined in .env
-        pass: 'ctmq cdzk uaqn aful'  // Defined in .env
+        user:'travelbusinessapp@gmail.com', // Defined in .env
+        pass: 'zbsz nqfv tpqi jenr'  // Defined in .env
     },
     tls: {
         rejectUnauthorized: false // Accept self-signed certificates
@@ -17,9 +17,9 @@ var config = {
 var transporter = nodemailer.createTransport(config);
 
 // Improved send function
-const send = async (to, cc,subject, html) => {
+const send = async (to,subject, html) => {
     // Ensure mail is properly scoped and use default settings
-    let mail = _.merge({}, {to, cc,subject, html});
+    let mail = _.merge({}, {to,subject, html});
 
     try {
         let info = await transporter.sendMail(mail);
