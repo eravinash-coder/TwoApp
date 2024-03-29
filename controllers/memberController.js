@@ -53,6 +53,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ memberId: member._id }, 'userNewsApp');
     res.send({ token, member });
   } catch (error) {
+    console.log(error.message);
     res.status(401).send(error.message);
   }
 };
@@ -146,7 +147,7 @@ const runMiddleware = (req, res, fn) => {
   });
 };
 exports.addMemberBulk = asyncHandler(async (req, res) => {
-  const associationId = "65ce362be5936300084aae86";
+  const associationId = "65d6cbde7ebd64000882efec";
   try {
 
     await runMiddleware(req, res, myUploadMiddleware);
