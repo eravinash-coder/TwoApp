@@ -5,9 +5,8 @@ const bcrypt = require('bcrypt');
 const asyncHandler = require("express-async-handler");
 const excel = require('exceljs');
 const multer = require('multer');
-const admin = require('firebase-admin');
 const { send } = require('../utils/mailer');
-
+const admin = require('../utils/firebase');
 
 
 exports.register = async (req, res) => {
@@ -199,11 +198,7 @@ exports.addMemberBulk = asyncHandler(async (req, res) => {
   }
 });
 
-const serviceAccount = require('../utils/serviceAccountKey.json'); // Path to your Firebase service account key file
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
 
 exports.sendNotification= asyncHandler(async (req, res) => {
   const { title,body } = req.body;

@@ -2,6 +2,10 @@ const express = require('express');
 const connectDB = require('./config/db');
 const formData = require('express-form-data');
 
+
+const countryRoutes = require('./routes/CountryRoutes');
+
+
 require('colors');
 require('dotenv').config();
 var cors = require('cors')
@@ -83,7 +87,7 @@ app.use('/api/uffta', ufftaRoutes);
 app.use('/api/ads', adRoutes);
 app.use('/api/insurence', insurenceRoutes);
 app.use('/api/hotnews', hotnewsRoutes );
-
+app.use('/api/country', countryRoutes);
 app.get('*', function(req, res){
   res.status(404).json({
     msg: "Api path not found."
