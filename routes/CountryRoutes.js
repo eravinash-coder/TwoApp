@@ -14,6 +14,7 @@ router.delete('/countries/:id', CountryController.deleteCountry);
 
 router.post('/CountryCategory/:countryId', CountryController.addCountryCategory);
 router.get('/CountryCategory/', CountryController.getCountryCategory);
+router.get('/CountryCategory/bycountryid/:countryId', CountryController.getAllCountryCategoryByCountryId);
 router.get('/CountryCategory/:countryId/:CountryCategoryId', CountryController.findCityById); 
 router.put('/CountryCategory/:countryId/:CountryCategoryId', CountryController.updateCountryCategory);
 router.delete('/CountryCategory/:countryId/:CountryCategoryId', CountryController.deleteCountryCategory);

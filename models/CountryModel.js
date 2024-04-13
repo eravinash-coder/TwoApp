@@ -88,10 +88,39 @@ async function addCountryCategory(countryId, cityData) {
 
         // Set the city data with the specified ID
         await cityRef.set(cityData);
+        return { success: true, message: 'City updated successfully' };
     } catch (error) {
         console.error('Error adding city to country: ', error);
     }
 }
+async function getAllCountryCategoryByCountryId(countryId) {
+    try {
+        const countryRef = db.collection('country').doc(countryId);
+        const countrySnapshot = await countryRef.get();
+
+        if (!countrySnapshot.exists) {
+            throw new Error('Country not found');
+        }
+
+        const citySnapshot = await countryRef.collection('countryCategory').get();
+
+        const allCountryCategories = [];
+
+        citySnapshot.forEach(cityDoc => {
+            allCountryCategories.push({
+                countryId,
+                cityId: cityDoc.id,
+                data: cityDoc.data()
+            });
+        });
+
+        return allCountryCategories;
+    } catch (error) {
+        console.error('Error getting country categories: ', error);
+        return [];
+    }
+}
+
 
 async function getAllCountryCategory() {
     try {
@@ -224,7 +253,7 @@ async function getCountryDataById(countryId, cityId, subcollectionId) {
             .collection('countryData').doc(subcollectionId).get();
         
         if (subcollectionDoc.exists) {
-            return { success: true, data: subcollectionDoc.data() };
+            return subcollectionDoc.data();
         } else {
             return { success: false, message: 'Subcollection data not found' };
         }
@@ -271,6 +300,7 @@ module.exports = {
     getAllCountryCategory,
     updateCountryCategory,
     deleteCountryCategory,
+    getAllCountryCategoryByCountryId,
     findById,
 
     addCountryData,

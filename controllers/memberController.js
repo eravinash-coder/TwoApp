@@ -146,7 +146,7 @@ const runMiddleware = (req, res, fn) => {
   });
 };
 exports.addMemberBulk = asyncHandler(async (req, res) => {
-  const associationId = "65d6cbde7ebd64000882efec";
+  const associationId = "65cd786fe47a330008f10ded";
   try {
 
     await runMiddleware(req, res, myUploadMiddleware);

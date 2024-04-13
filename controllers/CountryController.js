@@ -56,6 +56,18 @@ async function addCountryCategory(req, res) {
     const result = await CountryModel.addCountryCategory(countryId, cityData);
     res.json(result);
 }
+async function getAllCountryCategoryByCountryId(req, res) {
+    const countryId  = req.params.countryId;
+    const cityData = await CountryModel.getAllCountryCategoryByCountryId(countryId);
+    if (cityData) {
+        res.json({
+            success: true,
+            data: cityData
+        })
+    } else {
+        res.status(404).json({ message: 'City not found' });
+    }
+}
 
 async function getCountryCategory(req, res) {
     
@@ -85,7 +97,8 @@ async function findCityById(req, res) {
 
 async function updateCountryCategory(req, res) {
     const { countryId, CountryCategoryId } = req.params;
-    const newData = req.body;
+    const newData = req.body.NewsCat;
+    console.log(newData);
     const result = await CountryModel.updateCountryCategory(countryId, CountryCategoryId, newData);
     res.json(result);
 }
@@ -116,7 +129,7 @@ async function getAllCountryData(req, res) {
 async function getCountryDataById(req, res) {
     const { countryId, cityId, subcollectionId } = req.params;
     const result = await CountryModel.getCountryDataById(countryId, cityId, subcollectionId);
-    if (result.success) {
+    if (result) {
         res.json({
             success: true,
             data: result
@@ -128,7 +141,7 @@ async function getCountryDataById(req, res) {
 
 async function updateCountryData(req, res) {
     const { countryId, cityId, subcollectionId } = req.params;
-    const newData = req.body;
+    const newData = req.body.NewsCatData;
     const result = await CountryModel.updateCountryData(countryId, cityId, subcollectionId, newData);
     res.json(result);
 }
@@ -150,6 +163,7 @@ module.exports = {
     addCountryCategory,
     getCountryCategory,
     findCityById,
+    getAllCountryCategoryByCountryId,
     updateCountryCategory,
     deleteCountryCategory,
     
