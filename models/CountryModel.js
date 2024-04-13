@@ -70,7 +70,7 @@ async function deleteCountry(countryId) {
 
         // Now delete the country document
         await db.collection('country').doc(countryId).delete();
-        
+
         console.log('Country and its subcollection deleted successfully');
     } catch (error) {
         console.error('Error deleting country and subcollection: ', error);
@@ -129,11 +129,14 @@ async function getAllCountryCategory() {
 
         for (const countryDoc of countrySnapshot.docs) {
             const countryId = countryDoc.id;
+            const countryData = countryDoc.data(); // Accessing document data correctly
+            const countryName = countryData.countryName; // Correct way to access countryName
             const citySnapshot = await countryDoc.ref.collection('countryCategory').get();
 
             citySnapshot.forEach(cityDoc => {
                 allCountryCategories.push({
                     countryId,
+                    countryName,
                     cityId: cityDoc.id,
                     data: cityDoc.data()
                 });
@@ -180,7 +183,7 @@ async function deleteCountryCategory(countryId, cityId) {
     try {
         const countryRef = db.collection('country').doc(countryId);
         const cityRef = countryRef.collection('countryCategory').doc(cityId);
-        
+
         // Delete all documents in the subcollection
         const subcollectionSnapshot = await cityRef.collection('countryData').get();
         const deletePromises = [];
@@ -188,10 +191,10 @@ async function deleteCountryCategory(countryId, cityId) {
             deletePromises.push(doc.ref.delete());
         });
         await Promise.all(deletePromises);
-        
+
         // Now delete the city document itself
         await cityRef.delete();
-        
+
         return { success: true, message: 'City and its subcollection deleted successfully' };
     } catch (error) {
         console.error('Error deleting city:', error);
@@ -207,7 +210,7 @@ async function addCountryData(countryId, cityId, subcollectionData) {
         const subcollectionRef = cityRef.collection('countryData').doc(subcollectionData.id);
 
         await subcollectionRef.set(subcollectionData);
-        
+
         return { success: true, message: 'Subcollection added successfully' };
     } catch (error) {
         console.error('Error adding subcollection to city: ', error);
@@ -222,14 +225,21 @@ async function getAllCountryData() {
 
         for (const countryDoc of countrySnapshot.docs) {
             const countryId = countryDoc.id;
+            const countryDataa = countryDoc.data(); // Accessing document data correctly
+            const countryName = countryDataa.countryName; // Correct way to access countryName
             const citySnapshot = await countryDoc.ref.collection('countryCategory').get();
 
             for (const cityDoc of citySnapshot.docs) {
                 const cityId = cityDoc.id;
+                const countryDataa = cityDoc.data(); // Accessing document data correctly
+                const categoryName = countryDataa.categoryName; // Correct way to access countryName
+                
                 const countryDataSnapshot = await cityDoc.ref.collection('countryData').get();
 
                 countryDataSnapshot.forEach(subcollectionDoc => {
                     countryData.push({
+                        countryName,
+                        categoryName,
                         countryId,
                         cityId,
                         subcollectionId: subcollectionDoc.id,
@@ -238,7 +248,7 @@ async function getAllCountryData() {
                 });
             }
         }
-
+        
         return countryData;
     } catch (error) {
         console.error('Error getting all country data: ', error);
@@ -251,7 +261,7 @@ async function getCountryDataById(countryId, cityId, subcollectionId) {
         const subcollectionDoc = await db.collection('country').doc(countryId)
             .collection('countryCategory').doc(cityId)
             .collection('countryData').doc(subcollectionId).get();
-        
+
         if (subcollectionDoc.exists) {
             return subcollectionDoc.data();
         } else {
@@ -268,7 +278,7 @@ async function updateCountryData(countryId, cityId, subcollectionId, newData) {
         await db.collection('country').doc(countryId)
             .collection('countryCategory').doc(cityId)
             .collection('countryData').doc(subcollectionId).update(newData);
-        
+
         return { success: true, message: 'Subcollection data updated successfully' };
     } catch (error) {
         console.error('Error updating subcollection data: ', error);
@@ -281,7 +291,7 @@ async function deleteCountryData(countryId, cityId, subcollectionId) {
         await db.collection('country').doc(countryId)
             .collection('countryCategory').doc(cityId)
             .collection('countryData').doc(subcollectionId).delete();
-        
+
         return { success: true, message: 'Subcollection data deleted successfully' };
     } catch (error) {
         console.error('Error deleting subcollection data: ', error);
