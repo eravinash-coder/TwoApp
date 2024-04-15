@@ -40,6 +40,8 @@ const packageBuyerRoutes = require('./routes/packageBuyerRoutes');
 const adRoutes = require('./routes/AdRoutes');
 const insurenceRoutes = require('./routes/insurenceRoutes');
 const hotnewsRoutes = require('./routes/hotnewsRoutes');
+const LuxuryCarBookingRoutes = require('./routes/LuxuryCarBookingRoutes');
+
 const morgan = require('morgan');
 
 
@@ -88,6 +90,7 @@ app.use('/api/ads', adRoutes);
 app.use('/api/insurence', insurenceRoutes);
 app.use('/api/hotnews', hotnewsRoutes );
 app.use('/api/country', countryRoutes);
+app.use('/api/LuxuryCarBooking',LuxuryCarBookingRoutes);
 app.get('*', function(req, res){
   res.status(404).json({
     msg: "Api path not found."
