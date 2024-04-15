@@ -2,20 +2,14 @@ const mongoose = require('mongoose');
 
 const LaxuryTransportSchema = new mongoose.Schema({
     laxuryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Luxury' },
-    fname: String,
-    lname: String,
-
-    phone: String,
-
-    brandOfVehicle: String,
-
-    numberOfPeople: String,
-
-    luxury: String,
-
-    sluxury: String,
-
-    address: String
+    name: String,
+    title: String,
+    information:String,
+    video:String,
+    amenities: [String],
+    image_url: [Object],
+    home_url: [Object],
+    
 });
 
 module.exports = mongoose.model('LaxuryTransport', LaxuryTransportSchema);

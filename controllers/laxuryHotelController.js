@@ -23,7 +23,6 @@ function runMiddleware(req, res, fn) {
 }
 
 exports.addLaxuryHotel = asyncHandler(async (req, res) => {
-  console.log(req.body);
   try {
     const laxuryId = req.user.laxuryId;
     await runMiddleware(req, res, myUploadMiddleware);
