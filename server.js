@@ -119,7 +119,7 @@ io.on("connection", (socket) => {
   socket.on("new-user-add", (newUserId) => {
     // if user is not added previously
     if (!activeUsers.some((user) => user.userId === newUserId)) {
-      activeUsers.push({ userId: newUserId, socketId: socket.id });
+      activeUsers.push({ userId: newUserId, socketId: socket.sid });
       console.log("New User Connected", activeUsers);
     }
     // send all active users to new user
