@@ -1,14 +1,14 @@
 const express = require('express');
 const connectDB = require('./config/db');
 const formData = require('express-form-data');
-const morgan = require('morgan');
-const { Server } = require("http");
-const { Server: SocketServer } = require("socket.io");
-const cors = require('cors');
+
+
+const countryRoutes = require('./routes/CountryRoutes');
+
+
 require('colors');
 require('dotenv').config();
-
-// Import routes
+var cors = require('cors')
 const userRoutes = require('./routes/userRoutes.js');
 const newsRoutes = require('./routes/newsRoute.js');
 const categoryRoutes = require('./routes/categoryRoute');
@@ -41,21 +41,27 @@ const adRoutes = require('./routes/AdRoutes');
 const insurenceRoutes = require('./routes/insurenceRoutes');
 const hotnewsRoutes = require('./routes/hotnewsRoutes');
 const LuxuryCarBookingRoutes = require('./routes/LuxuryCarBookingRoutes');
+
 const ChatRoute = require('./routes/ChatRoute');
 const MessageRoute = require('./routes/MessageRoute');
-const countryRoutes = require('./routes/CountryRoutes');
+
+
+const morgan = require('morgan');
+
+
 
 connectDB();
 
 const app = express();
 
-// Express middleware setup
 app.use(express.json({ limit: '100mb' }));
-app.use(formData.parse());
-app.use(cors());
-app.use(morgan('dev')); // Logging middleware
 
-// Define your routes
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
+
+app.use(cors());
 app.use('/api/users', userRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/category', categoryRoutes);
@@ -76,7 +82,7 @@ app.use('/api/destinationProgram', destinationProgramRoutes);
 app.use('/api/advisoryBoard', advisoryBoardRoutes);
 app.use('/api/interview', interviewRoutes);
 app.use('/api/chapters', chaptersRoutes);
-app.use('/api/boards', boardsRoutes);
+app.use('/api/boards',boardsRoutes );
 app.use('/api/abouts', aboutRoutes);
 app.use('/api/luxury', luxuryRoutes);
 app.use('/api/', dmcRoutes);
@@ -86,13 +92,11 @@ app.use('/api/PackageBuyer', packageBuyerRoutes);
 app.use('/api/uffta', ufftaRoutes);
 app.use('/api/ads', adRoutes);
 app.use('/api/insurence', insurenceRoutes);
-app.use('/api/hotnews', hotnewsRoutes);
+app.use('/api/hotnews', hotnewsRoutes );
 app.use('/api/country', countryRoutes);
 app.use('/api/LuxuryCarBooking',LuxuryCarBookingRoutes);
-app.use('/api/chat', ChatRoute);
-app.use('/api/message', MessageRoute);
-
-// 404 Route
+app.use('/api/chat', ChatRoute)
+app.use('/api/message', MessageRoute)
 app.get('*', function(req, res){
   res.status(404).json({
     msg: "Api path not found."
@@ -100,53 +104,9 @@ app.get('*', function(req, res){
 });
 
 const PORT = process.env.PORT || 3000;
-
-// Create HTTP server instance from Express app
-const server = Server(app);
-
-// Create Socket.IO instance and attach it to the HTTP server
-const io = new SocketServer(server, {
-  cors: {
-    origin: "*", // Allow requests from all origins
-  },
-});
-
-let activeUsers = [];
-
-// Socket.IO logic
-io.on("connection", (socket) => {
-  // add new User
-  socket.on("new-user-add", (newUserId) => {
-    // if user is not added previously
-    if (!activeUsers.some((user) => user.userId === newUserId)) {
-      activeUsers.push({ userId: newUserId, socketId: socket.sid });
-      console.log("New User Connected", activeUsers);
-    }
-    // send all active users to new user
-    io.emit("get-users", activeUsers);
-  });
-
-  socket.on("disconnect", () => {
-    // remove user from active users
-    activeUsers = activeUsers.filter((user) => user.socketId !== socket.id);
-    console.log("User Disconnected", activeUsers);
-    // send all active users to all users
-    io.emit("get-users", activeUsers);
-  });
-
-  // send message to a specific user
-  socket.on("send-message", (data) => {
-    const { receiverId } = data;
-    const user = activeUsers.find((user) => user.userId === receiverId);
-    console.log("Sending from socket to :", receiverId)
-    console.log("Data: ", data)
-    if (user) {
-      io.to(user.socketId).emit("recieve-message", data);
-    }
-  });
-});
-
-// Start listening on the specified port
-server.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
+app.listen(
+  PORT,
+  console.log(
+    `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.red,
+  ),
+);
