@@ -132,7 +132,7 @@ exports.getAllHotels = async (req, res) => {
             return res.status(403).send('Unauthorized');
         }
 
-        const Hotels = await Hotel.find({  dealType: '0'  });
+        const Hotels = await Hotel.find({  dealType: '0'  }).sort("-addedAt");
 
 
         const modifiedHotels = [];

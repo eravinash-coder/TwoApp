@@ -133,7 +133,7 @@ exports.getAllPackages = async (req, res) => {
             return res.status(403).send('Unauthorized');
         }
 
-        const Packages = await Package.find({ dealType: '0' });
+        const Packages = await Package.find({ dealType: '0' }).sort("-addedAt");
 
         const modifiedPackage = [];
 
