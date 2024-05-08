@@ -94,7 +94,7 @@ exports.getPackages = async (req, res) => {
             return res.status(403).send('Unauthorized');
         }
 
-        const Packages = await Package.find({ associationId });
+        const Packages = await Package.find({ associationId }).sort("-addedAt");
 
         const modifiedPackage = [];
 

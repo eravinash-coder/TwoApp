@@ -89,7 +89,7 @@ exports.getTransport = async (req, res) => {
             return res.status(403).send('Unauthorized');
         }
 
-        const Transports = await Transport.find({ associationId });
+        const Transports = await Transport.find({ associationId }).sort("-addedAt");
 
 
         const modifiedtransport = [];
