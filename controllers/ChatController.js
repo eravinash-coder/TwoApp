@@ -49,12 +49,13 @@ exports.findChat = async (req, res) => {
   try {
     const chat = await ChatModel.findOne({
       members: { $all: [req.params.firstId, req.params.secondId] },
-    });
-    res.status(200).json(chat)
+    }).sort({ createdAt: -1 }); // Sort by createdAt field in descending order
+    res.status(200).json(chat);
   } catch (error) {
-    res.status(500).json(error)
+    res.status(500).json(error);
   }
 };
+
 
 
 exports.deleteChat = async (req, res) => {
