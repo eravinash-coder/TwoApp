@@ -12,7 +12,7 @@ exports.createChat = async (req, res) => {
 
     if (existingChat) {
       // If a chat already exists, return a response indicating so
-      return res.status(200).json({ message: 'Chat already exists' });
+      return res.status(200).json(existingChat);
     }
 
     // If no existing chat found, proceed to create a new chat
