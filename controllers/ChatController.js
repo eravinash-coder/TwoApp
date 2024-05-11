@@ -12,7 +12,7 @@ exports.createChat = async (req, res) => {
 
     if (existingChat) {
       // If a chat already exists, return a response indicating so
-      return res.status(200).json(existingChat);
+      return res.status(200).json(result);
     }
 
     // If no existing chat found, proceed to create a new chat
@@ -38,7 +38,7 @@ exports.userChats = async (req, res) => {
   try {
     const chat = await ChatModel.find({
       members: { $in: [req.params.userId] },
-    });
+    }).sort("-createdAt");
     res.status(200).json(chat);
   } catch (error) {
     res.status(500).json(error);
@@ -49,13 +49,12 @@ exports.findChat = async (req, res) => {
   try {
     const chat = await ChatModel.findOne({
       members: { $all: [req.params.firstId, req.params.secondId] },
-    }).sort({ createdAt: 1 }); // Sort by createdAt field in descending order
-    res.status(200).json(chat);
+    });
+    res.status(200).json(chat)
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).json(error)
   }
 };
-
 
 
 exports.deleteChat = async (req, res) => {
