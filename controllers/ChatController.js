@@ -17,9 +17,11 @@ exports.createChat = async (req, res) => {
 
     // If no existing chat found, proceed to create a new chat
     const Member = await MemberModel.findById(req.body.receiverId);
+    const MemberS = await MemberModel.findById(req.body.senderId);
     const newChat = new ChatModel({
       members: [req.body.senderId, req.body.receiverId],
-      name: Member.name,
+      senderName: MemberS.name,
+      receiverName: Member.name,
     });
 
     const result = await newChat.save();
