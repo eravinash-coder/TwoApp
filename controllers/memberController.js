@@ -200,14 +200,13 @@ exports.addMemberBulk = asyncHandler(async (req, res) => {
 
 
 
-exports.sendNotification= asyncHandler(async (req, res) => {
-  const { title,body } = req.body;
+exports.sendNotification = asyncHandler(async (req, res) => {
+  const { title, body } = req.body;
   const associationId = req.user.associationId;
 
   try {
     // Find all members with the given associationId
     const members = await Member.find({ associationId });
-
     if (!members || members.length === 0) {
       return res.status(404).send('No members found for the association');
     }
@@ -216,7 +215,7 @@ exports.sendNotification= asyncHandler(async (req, res) => {
     const message = {
       notification: {
         title,
-        body
+        body,
       },
     };
 
@@ -224,20 +223,22 @@ exports.sendNotification= asyncHandler(async (req, res) => {
     const responses = await Promise.all(
       members.map(async (member) => {
         if (member.FmcToken) {
-          message.token = member.FmcToken;
-          return admin.messaging().send(message);
+          try {
+            message.token = member.FmcToken;
+            await admin.messaging().send(message);
+            
+          } catch (error) {
+            if (error.code === 'messaging/registration-token-not-registered') {
+              // Remove invalid token from the database
+              await Member.findByIdAndUpdate(member._id, { $unset: { FmcToken: 1 } });
+              
+            } else {
+              console.error('Error sending message to member:', member._id, error);
+            }
+          }
         }
       })
     );
-
-    // Handle responses
-    // responses.forEach((response, index) => {
-    //   if (response) {
-    //     console.log('Successfully sent message to member:', members[index]._id);
-    //   } else {
-    //     console.error('Failed to send message to member:', members[index]._id);
-    //   }
-    // });
 
     res.status(200).send('Notifications sent successfully');
   } catch (error) {
@@ -245,7 +246,6 @@ exports.sendNotification= asyncHandler(async (req, res) => {
     res.status(500).send('Error sending notifications');
   }
 });
-
 exports.forgotPassword = asyncHandler(async (req, res) => {
   try {
 
