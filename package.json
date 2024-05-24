@@ -21,6 +21,7 @@
     "express-async-handler": "^1.1.4",
     "express-form-data": "^2.0.16",
     "firebase-admin": "^12.0.0",
+    "generate-password": "^1.7.1",
     "image-to-base64": "^2.2.0",
     "jsonwebtoken": "^9.0.2",
     "loadsh": "0.0.4",

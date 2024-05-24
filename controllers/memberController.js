@@ -7,6 +7,7 @@ const excel = require('exceljs');
 const multer = require('multer');
 const { send } = require('../utils/mailer');
 const admin = require('../utils/firebase');
+const generator = require('generate-password');
 
 
 exports.register = async (req, res) => {
@@ -146,7 +147,7 @@ const runMiddleware = (req, res, fn) => {
   });
 };
 exports.addMemberBulk = asyncHandler(async (req, res) => {
-  const associationId = "65cd786fe47a330008f10ded";
+  const associationId = "664dd1d24b69470008724ef6";
   try {
 
     await runMiddleware(req, res, myUploadMiddleware);
@@ -154,43 +155,46 @@ exports.addMemberBulk = asyncHandler(async (req, res) => {
     await workbook.xlsx.load(req.file.buffer);
     const worksheet = workbook.getWorksheet(1);
     const data = [];
-    for (let i = 1; i <= worksheet.rowCount; i++) {
-      const row = worksheet.getRow(i);
-      const email = row.getCell(4).value;
+    console.log(worksheet.rowCount);
+    // for (let i = 1; i <= worksheet.rowCount; i++) {
+    //   const row = worksheet.getRow(i);
+    //   const email = row.getCell(3).value;
       
-      const existingMember = await Member.findOne({ associationId, email });
+    //   const existingMember = await Member.findOne({ associationId, email });
 
-      if (existingMember) {
-        console.log(existingMember);
-        continue; // Skip insertion if email already exists
-      }
-      const name = row.getCell(2).value;
-      const firstName = name.split(' ')[0];
-      const password = firstName + "@12345";
+    //   if (existingMember) {
+    //     console.log(existingMember);
+    //     continue; // Skip insertion if email already exists
+    //   }
+    //   const name = row.getCell(2).value;
+    //   var password = generator.generate({
+    //     length: 10,
+    //     numbers: true
+    //   });
 
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 10);
+    //   // Hash the password
+    //   const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Create new member instance
-      const newMember = new Member({
-        associationId,
-        name,
-        email,
-        password: hashedPassword // Store the hashed password
-      });
+    //   // Create new member instance
+    //   const newMember = new Member({
+    //     associationId,
+    //     name,
+    //     email,
+    //     password: hashedPassword // Store the hashed password
+    //   });
 
-     const membersend = await newMember.save();
+    //  const membersend = await newMember.save();
 
-     if(membersend){
-      const to = email;
-      const subject = 'Login Password';
-      const html = `Hello ${name},\n\nYour password for registration is: ${password} <br/> Thank you for registering with us. `;
+    // //  if(membersend){
+    // //   const to = email;
+    // //   const subject = 'Login Password';
+    // //   const html = `Hello ${name},\n\nYour password for registration is: ${password} <br/> Thank you for registering with us. `;
 
-      await send(to, subject, html);
+    // //   await send(to, subject, html);
 
-     }
+    // //  }
 
-    }
+    // }
     res.send('Data import complete');
   } catch (error) {
     console.error('Error importing data:', error);
@@ -259,8 +263,10 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
       });
     }
     const name = memberExists.name;
-    const firstName = name.split(' ')[0];
-    const password = firstName+"@12345";
+    var password = generator.generate({
+      length: 10,
+      numbers: true
+    });
     const hashedPassword = await bcrypt.hash(password, 10);
     const _id = memberExists._id;
     const member = await Member.findByIdAndUpdate(_id, {password:hashedPassword},{ new: true });
