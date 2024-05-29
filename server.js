@@ -45,6 +45,9 @@ const LuxuryCarBookingRoutes = require('./routes/LuxuryCarBookingRoutes');
 const ChatRoute = require('./routes/ChatRoute');
 const MessageRoute = require('./routes/MessageRoute');
 
+const pppRoutes = require('./routes/pppRoutes');
+
+
 
 const morgan = require('morgan');
 
@@ -95,8 +98,9 @@ app.use('/api/insurence', insurenceRoutes);
 app.use('/api/hotnews', hotnewsRoutes );
 app.use('/api/country', countryRoutes);
 app.use('/api/LuxuryCarBooking',LuxuryCarBookingRoutes);
-app.use('/api/chat', ChatRoute)
-app.use('/api/message', MessageRoute)
+app.use('/api/chat', ChatRoute);
+app.use('/api/message', MessageRoute);
+app.use('/api/ppp', pppRoutes);
 app.get('*', function(req, res){
   res.status(404).json({
     msg: "Api path not found."

@@ -48,7 +48,6 @@ exports.register = asyncHandler(async (req, res) => {
       );
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log
     var association = new Association({
       name,
       type,
@@ -155,7 +154,6 @@ exports.editAssociation = asyncHandler(async (req, res) => {
     
     await runMiddleware(req, res, myUploadMiddleware);
     const { name, type, shortName, email , password} = req.body;
-    console.log(req.body);
     let association = await Association.findById(req.params.associationId);
     
 
