@@ -3,6 +3,7 @@ const generateToken = require('../utils/generateToken.js')
 const User = require('../models/userModel.js')
 const Association = require('../models/Association.js')
 const luxury = require('../models/Luxury.js')
+const PPP = require('../models/ppp.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 var crypto = require('crypto');
@@ -17,11 +18,11 @@ const authUser = asyncHandler(async (req, res) => {
 
   try {
     const { email, password  } = req.body
-    
 
     const user = await User.findOne({ email })
     const association = await Association.findOne({email});
     const Luxury = await luxury.findOne({email});
+    const ppp = await PPP.findOne({email});
 
     if (user && (await user.matchPassword(password))) {
       res.json({
@@ -32,8 +33,7 @@ const authUser = asyncHandler(async (req, res) => {
         token: generateToken(user._id),
         redirectUrl: "/admin"
       }) 
-    } 
-    else if (association && (await bcrypt.compare(password, association.password))){
+    }else if (association && (await bcrypt.compare(password, association.password))){
       const token = jwt.sign({ associationId: association._id }, 'userNewsApp');
       res.json({
         name: association.name,
@@ -51,8 +51,16 @@ const authUser = asyncHandler(async (req, res) => {
         token,
         redirectUrl: Luxury.type
       })
-    }
-    else {
+    }else if (ppp && (await ppp.comparePassword(password))){
+      const token = jwt.sign({ pppId: ppp._id }, 'userNewsApp');
+      res.json({
+        name: ppp.name,
+        email: ppp.email,
+        avatar: ppp.image[0],
+        token,
+        redirectUrl: "/ppp"
+      })
+    }else {
       res.status(401).json({
         success: false,
         msg: 'Unauthorized user'
