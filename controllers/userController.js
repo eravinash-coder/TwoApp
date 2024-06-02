@@ -11,6 +11,27 @@ var mailer = require('../utils/mailer');
 const { generateOtp, verifyOtp } = require('../utils/otp.js');
 
 
+const multer = require('multer');
+
+const handleUpload = require('../helpers/upload')
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+const myUploadMiddleware = upload.fields([
+  { name: 'image', maxCount: 10 },
+]);
+
+
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
+}
+
 // @desc    Auth user & get token
 // @route   POST /api/users/login
 // @access  Public
@@ -24,14 +45,14 @@ const authUser = asyncHandler(async (req, res) => {
     const Luxury = await luxury.findOne({email});
     const ppp = await PPP.findOne({email});
 
-    if (user && (await user.matchPassword(password))) {
+    if (user && (await user.comparePassword(password))) {
       res.json({
         _id: user._id,
         name: user.name,
         email: user.email,
-        avatar: user.avatar,
+        avatar: user.image[0],
         token: generateToken(user._id),
-        redirectUrl: "/admin"
+        redirectUrl: user.role
       }) 
     }else if (association && (await bcrypt.compare(password, association.password))){
       const token = jwt.sign({ associationId: association._id }, 'userNewsApp');
@@ -76,45 +97,48 @@ const authUser = asyncHandler(async (req, res) => {
 // @route   POST /api/users
 // @access  Public
 const registerUser = asyncHandler(async (req, res, next) => {
-
-  const { name, email, password } = req.body
-  const userExists = await User.findOne({ email })
-
-  if (userExists) {
-    return res.status(400).json({
-      success: false,
-      msg: 'Entered email id already registered with us. Login to continue'
-    })
-  }
-
-
-  const user = new User({
-    name,
-    email,
-    password,
-  })
-
-
-  // save user object
-  user.save(function (err, user) {
-    if (err) return next(err);
+  try {
+    await runMiddleware(req, res, myUploadMiddleware);
+    const { name, role, email, password } = req.body;
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({
+        success: false,
+        msg: 'Entered email id already registered with us. Login to continue'
+      })
+    }
+    let imageObjects;
+    if (req.files && req.files['image']) {
+      imageObjects = await Promise.all(
+        req.files['image'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
+    }
+    var user = new User({
+      name,
+      role,
+      email,
+      password, 
+      image: imageObjects
+    });
+  
+    var record = await user.save();
+  
+    // Send success response inside the try block
     res.status(201).json({
       success: true,
-      msg: 'Account Created Sucessfully. Please log in.'
+      msg: "PPP Added Successfully!",
+      data: record,
     });
-  });
-
-  // if (user) {
-  //   res.status(201).json({
-  //     _id: user._id,
-  //     name: user.name,
-  //     email: user.email,
-  //     token: generateToken(user._id),
-  //   })
-  // } else {
-  //   res.status(400)
-  //   throw new Error('Invalid user data')
-  // }
+  
+  } catch (error) {
+    // Send error response inside the catch block
+    res.status(400).json({ success: false, msg: error.message });
+    console.log(error.message);
+  }
 })
 
 
@@ -173,8 +197,11 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 // @route   GET /api/users
 // @access  Private/Admin
 const getUsers = asyncHandler(async (req, res) => {
-  const users = await User.find({})
-  res.json(users)
+  const users = await User.find({ role: { $ne: 'admin' } })
+  res.json({
+    success: true,
+    data: users,
+  });
 })
 
 // @desc    Delete user
@@ -196,10 +223,13 @@ const deleteUser = asyncHandler(async (req, res) => {
 // @route   GET /api/users/:id
 // @access  Private/Admin
 const getUserById = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id).select('-password')
+  const user = await User.findById(req.params.id)
 
   if (user) {
-    res.json(user)
+    res.json({
+      success: true,
+      data: user,
+    });
   } else {
     res.status(404)
     throw new Error('User not found')
@@ -263,139 +293,6 @@ const resetPassword = asyncHandler(async (req, res) => {
   // }
 });
 
-const addToFav = asyncHandler(async (req, res) => {
-  const newsId = req.params.newsId;
-  const userId = req.user._id;
-
-  // let obj = arr.find(o => o.name === 'string 1');
-  // check if exist news in fav array or not
-
-  let user = await User.findById(userId);
-  console.log("user", user)
-
-  let foundNews = user.favorites.find(obj => {
-    console.log(obj)
-    return obj.news == newsId
-  });
-
-  console.log("foundNews", foundNews)
-  if (foundNews) {
-
-
-    let newUserData = user.favorites.filter((obj) => {
-      return obj.news != newsId
-    })
-
-
-    user.favorites = newUserData;
-
-    await user.save()
-
-    return res.status(201).json({
-      success: true,
-      msg: 'Removed from your favorite lists.'
-    })
-  }
-
-  let user1 = user.favorites.push({ news: newsId });
-  await user.save();
-  console.log(user1)
-
-  res.status(201).json({
-    success: true,
-    msg: 'Added to your favorite lists.'
-  })
-
-})
-
-
-
-const getFavorites = asyncHandler(async (req, res) => {
-  const userId = req.user._id;
-  const user = await User.findById(userId)
-    .populate({
-      path: 'favorites.news',
-      populate: ('category')
-    })
-
-
-  console.log(req)
-  res.json({
-    success: true,
-    data: user.favorites,
-    msg: 'Successfully fetched'
-  })
-})
-
-
-const checkFavExistsOrNot = asyncHandler(async (req, res) => {
-  const userId = req.user._id;
-  const newsId = req.params.newsId
-
-  let user = await User.findById(userId);
-  console.log("user", user)
-
-  let foundNews = user.favorites.find(obj => {
-    console.log(obj)
-    return obj.news == newsId
-  });
-
-  console.log("foundNews", foundNews)
-  if (!foundNews) {
-    return res.json({
-      success: true,
-      exists: false,
-      msg: 'News id not exists in your favorite list.'
-    })
-  }
-  res.json({
-    success: true,
-    exists: true,
-    msg: 'News id exists in your favorite list.'
-  })
-
-})
-
-
-
-const removeFavorite = asyncHandler(async (req, res) => {
-  const userId = req.user._id;
-  const newsId = req.params.newsId
-
-  let user = await User.findById(userId);
-  console.log("user", user)
-
-  let foundNews = user.favorites.find(obj => {
-    console.log(obj)
-    return obj.news == newsId
-  });
-
-  console.log("foundNews", foundNews)
-  if (!foundNews) {
-    return res.json({
-      success: false,
-      msg: 'News id not exists in your favorite list.'
-    })
-  }
-
-
-  let newUserData = user.favorites.filter((obj) => {
-    return obj.news != newsId
-  })
-
-
-  user.favorites = newUserData;
-
-  await user.save()
-
-
-  res.json({
-    success: true,
-    data: newUserData,
-    msg: 'Successfully removed'
-  })
-
-})
 
 
 module.exports = {
@@ -407,9 +304,5 @@ module.exports = {
   deleteUser,
   getUserById,
   updateUser,
-  resetPassword,
-  addToFav,
-  getFavorites,
-  removeFavorite,
-  checkFavExistsOrNot
+  resetPassword
 }

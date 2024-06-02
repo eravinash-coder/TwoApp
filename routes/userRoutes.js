@@ -9,16 +9,12 @@ const {
   deleteUser,
   getUserById,
   updateUser,
-  addToFav,
-  getFavorites,
-  removeFavorite,
   resetPassword,
-  checkFavExistsOrNot
 } = require('../controllers/userController');
 
 const protect = require('../middleware/authMiddleware.js')
 
-router.route('/').post(registerUser).get(protect, getUsers)
+router.route('/').post(registerUser).get(getUsers)
 router.route('/login').post(authUser)
 router
   .route('/profile')
@@ -26,15 +22,10 @@ router
   .put(protect, updateUserProfile)
 router
   .route('/:id')
-//   .delete(protect, deleteUser)
+   .delete(deleteUser)
   .get(getUserById)
-//   .put(protect, updateUser)
+  .put(updateUser)
 
 router.route('/profile/password/reset').post(protect ,resetPassword);
-
-router.route('/addToFav/:newsId').put(protect, addToFav)
-router.route('/getFavOfUser/all').get(protect, getFavorites)
-
-router.route('/checkExists/fav/:newsId').get(protect, checkFavExistsOrNot)
 
 module.exports = router
