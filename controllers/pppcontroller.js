@@ -137,9 +137,11 @@ exports.editPPP = asyncHandler(async (req, res) => {
   }
 });
 // Add a policy to a PPP document
-exports.addPolicy = async (req, res) => {
+exports.addPolicy = asyncHandler(async (req, res,) => {
   try {
+    await runMiddleware(req, res,myUploadMiddleware);
     const { id } = req.params;
+    console.log(req.body);
     const policy = req.body;
     const ppp = await PPP.findById(id);
     if (!ppp) {
@@ -150,12 +152,94 @@ exports.addPolicy = async (req, res) => {
     res.status(200).json(ppp);
   } catch (error) {
     res.status(400).json({ error: error.message });
+    console.log(error.message );
+  }
+});
+
+exports.getPolicies = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const ppp = await PPP.findById(id);
+    if (!ppp) {
+      return res.status(404).json({ error: 'PPP not found' });
+    }
+    res.status(200).json({
+      success: true,
+      data: ppp.tourismpolicy,
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Get policy by ID
+exports.getPolicyById = async (req, res) => {
+  try {
+    const { id, policyId } = req.params;
+    const ppp = await PPP.findById(id);
+    if (!ppp) {
+      return res.status(404).json({ error: 'PPP not found' });
+    }
+    const policy = ppp.tourismpolicy.id(policyId);
+    if (!policy) {
+      return res.status(404).json({ error: 'Policy not found' });
+    }
+    res.status(200).json({
+      success: true,
+      data: policy,
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Update policy
+exports.updatePolicy = asyncHandler(async (req, res) => {
+  try {
+    await runMiddleware(req, res,myUploadMiddleware);
+    const { id, policyId } = req.params;
+    const policyUpdates = req.body;
+    console.log(policyUpdates);
+    const ppp = await PPP.findById(id);
+    if (!ppp) {
+      return res.status(404).json({ error: 'PPP not found' });
+    }
+    const policy = ppp.tourismpolicy.id(policyId);
+    if (!policy) {
+      return res.status(404).json({ error: 'Policy not found' });
+    }
+    Object.assign(policy, policyUpdates);
+    await ppp.save();
+    res.status(200).json(ppp);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Delete policy
+exports.deletePolicy = async (req, res) => {
+  try {
+    const { id, policyId } = req.params;
+    const ppp = await PPP.findById(id);
+    if (!ppp) {
+      return res.status(404).json({ error: 'PPP not found' });
+    }
+    const policy = ppp.tourismpolicy.id(policyId);
+    if (!policy) {
+      return res.status(404).json({ error: 'Policy not found' });
+    }
+    policy.remove();
+    await ppp.save();
+    res.status(200).json(ppp);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 };
 
 // Add an investment opportunity to a PPP document
-exports.addInvestmentOpportunity = async (req, res) => {
+exports.addInvestmentOpportunity = asyncHandler(async (req, res) => {
   try {
+    await runMiddleware(req, res,myUploadMiddleware);
     const { id } = req.params;
     const opportunity = req.body;
     const ppp = await PPP.findById(id);
@@ -163,6 +247,86 @@ exports.addInvestmentOpportunity = async (req, res) => {
       return res.status(404).json({ error: 'PPP not found' });
     }
     ppp.investmentOpportunity.push(opportunity);
+    await ppp.save();
+    res.status(200).json(ppp);
+  } catch (error) { 
+    res.status(400).json({ error: error.message });
+  }
+});
+
+exports.getInvestmentOpportunities = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const ppp = await PPP.findById(id);
+    if (!ppp) {
+      return res.status(404).json({ error: 'PPP not found' });
+    }
+    res.status(200).json({
+      success: true,
+      data: ppp.investmentOpportunity,
+    });
+
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Get investment opportunity by ID
+exports.getInvestmentOpportunityById = async (req, res) => {
+  try {
+    const { id, opportunityId } = req.params;
+    const ppp = await PPP.findById(id);
+    if (!ppp) {
+      return res.status(404).json({ error: 'PPP not found' });
+    }
+    const opportunity = ppp.investmentOpportunity.id(opportunityId);
+    if (!opportunity) {
+      return res.status(404).json({ error: 'Investment Opportunity not found' });
+    }
+    res.status(200).json({
+      success: true,
+      data: opportunity,
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Update investment opportunity
+exports.updateInvestmentOpportunity = asyncHandler(async (req, res) => {
+  try {
+    await runMiddleware(req, res,myUploadMiddleware);
+    const { id, opportunityId } = req.params;
+    const opportunityUpdates = req.body;
+    const ppp = await PPP.findById(id);
+    if (!ppp) {
+      return res.status(404).json({ error: 'PPP not found' });
+    }
+    const opportunity = ppp.investmentOpportunity.id(opportunityId);
+    if (!opportunity) {
+      return res.status(404).json({ error: 'Investment Opportunity not found' });
+    }
+    Object.assign(opportunity, opportunityUpdates);
+    await ppp.save();
+    res.status(200).json(ppp);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Delete investment opportunity
+exports.deleteInvestmentOpportunity = async (req, res) => {
+  try {
+    const { id, opportunityId } = req.params;
+    const ppp = await PPP.findById(id);
+    if (!ppp) {
+      return res.status(404).json({ error: 'PPP not found' });
+    }
+    const opportunity = ppp.investmentOpportunity.id(opportunityId);
+    if (!opportunity) {
+      return res.status(404).json({ error: 'Investment Opportunity not found' });
+    }
+    opportunity.remove();
     await ppp.save();
     res.status(200).json(ppp);
   } catch (error) {

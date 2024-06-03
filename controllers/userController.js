@@ -75,6 +75,7 @@ const authUser = asyncHandler(async (req, res) => {
     }else if (ppp && (await ppp.comparePassword(password))){
       const token = jwt.sign({ pppId: ppp._id }, 'userNewsApp');
       res.json({
+        id:ppp._id,
         name: ppp.name,
         email: ppp.email,
         avatar: ppp.image[0],
