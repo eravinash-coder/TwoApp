@@ -1,7 +1,9 @@
 const express = require('express');
 const connectDB = require('./config/db');
 const formData = require('express-form-data');
-
+const Booking = require('./models/Booking');
+const cron = require('node-cron');
+const moment = require('moment');
 
 const countryRoutes = require('./routes/CountryRoutes');
 
@@ -41,6 +43,7 @@ const adRoutes = require('./routes/AdRoutes');
 const insurenceRoutes = require('./routes/insurenceRoutes');
 const hotnewsRoutes = require('./routes/hotnewsRoutes');
 const LuxuryCarBookingRoutes = require('./routes/LuxuryCarBookingRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
 
 const ChatRoute = require('./routes/ChatRoute');
 const MessageRoute = require('./routes/MessageRoute');
@@ -85,7 +88,7 @@ app.use('/api/destinationProgram', destinationProgramRoutes);
 app.use('/api/advisoryBoard', advisoryBoardRoutes);
 app.use('/api/interview', interviewRoutes);
 app.use('/api/chapters', chaptersRoutes);
-app.use('/api/boards',boardsRoutes );
+app.use('/api/boards', boardsRoutes);
 app.use('/api/abouts', aboutRoutes);
 app.use('/api/luxury', luxuryRoutes);
 app.use('/api/', dmcRoutes);
@@ -95,17 +98,66 @@ app.use('/api/PackageBuyer', packageBuyerRoutes);
 app.use('/api/uffta', ufftaRoutes);
 app.use('/api/ads', adRoutes);
 app.use('/api/insurence', insurenceRoutes);
-app.use('/api/hotnews', hotnewsRoutes );
+app.use('/api/hotnews', hotnewsRoutes);
 app.use('/api/country', countryRoutes);
-app.use('/api/LuxuryCarBooking',LuxuryCarBookingRoutes);
+app.use('/api/LuxuryCarBooking', LuxuryCarBookingRoutes);
 app.use('/api/chat', ChatRoute);
 app.use('/api/message', MessageRoute);
 app.use('/api/ppp', pppRoutes);
-app.get('*', function(req, res){
+app.use('/api', appointmentRoutes);
+
+app.get('*', function (req, res) {
   res.status(404).json({
     msg: "Api path not found."
   });
 });
+
+
+
+
+async function initializeTimeSlots() {
+  try{
+  console.log('Initializing time slots...');
+  const currentDate = new Date();
+  const futureDate = new Date();
+  futureDate.setDate(currentDate.getDate() + 7); // Initialize for the next 7 days
+
+  for (let date = new Date(currentDate); date <= futureDate; date.setDate(date.getDate() + 1)) {
+    const formattedDate = moment(date).format('YYYY-MM-DD');
+    const bookingExists = await Booking.findOne({ date: formattedDate });
+
+    if (!bookingExists) {
+      const timeSlots = [];
+      for (let hour = 9; hour <= 17; hour++) { // Example: 9 AM to 5 PM
+        const timeSlot = {
+          time: `${hour}:00`,
+          available: true
+        };
+        timeSlots.push(timeSlot);
+      }
+
+      await Booking.create({ date: formattedDate, timeSlots });
+      console.log(`Time slots created for date: ${formattedDate}`);
+    } else {
+      console.log(`Booking already exists for date: ${formattedDate}`);
+    }
+  }
+  console.log('Time slots initialization completed successfully');
+}catch(e){
+  console.log(e);
+}
+}
+
+
+// Schedule task to run every day at midnight to initialize time slots
+cron.schedule('0 0 * * *', async () => {
+  console.log('Running scheduled task to initialize time slots...');
+  await initializeTimeSlots();
+}, {
+  scheduled: true,
+  timezone: "Asia/Kolkata" // Indian Standard Time (IST)
+});
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(

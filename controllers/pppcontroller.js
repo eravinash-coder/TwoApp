@@ -378,3 +378,16 @@ exports.deletePPPById = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+// Controller function to get only the names
+exports.getPPPNams = async (req, res) => {
+  try {
+    // Find all documents and select only the 'name' field
+    const names = await PPP.find({}, 'name');
+    res.status(200).json(names);
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving names', error });
+  }
+};
+

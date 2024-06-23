@@ -4,7 +4,7 @@ const pppController = require('../controllers/pppcontroller');
 
 router.post('/register', pppController.register);
 router.post('/login', pppController.login);
-
+router.get('/name/ppp-names', pppController.getPPPNams);
 
 router.post('/:id/addPolicy', pppController.addPolicy);
 router.post('/:id/addInvestmentOpportunity', pppController.addInvestmentOpportunity);
