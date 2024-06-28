@@ -44,6 +44,7 @@ const insurenceRoutes = require('./routes/insurenceRoutes');
 const hotnewsRoutes = require('./routes/hotnewsRoutes');
 const LuxuryCarBookingRoutes = require('./routes/LuxuryCarBookingRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
+const StackHolderRoutes = require('./routes/StackHolderRoutes');
 
 const ChatRoute = require('./routes/ChatRoute');
 const MessageRoute = require('./routes/MessageRoute');
@@ -105,6 +106,7 @@ app.use('/api/chat', ChatRoute);
 app.use('/api/message', MessageRoute);
 app.use('/api/ppp', pppRoutes);
 app.use('/api', appointmentRoutes);
+app.use('/api/StackHolder', StackHolderRoutes);
 
 app.get('*', function (req, res) {
   res.status(404).json({
