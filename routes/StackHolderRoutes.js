@@ -3,7 +3,7 @@ const router = express.Router();
 const StackHoderController = require('../controllers/StackHoderController');
 
 router.post('/addStackHolder', StackHoderController.addStackHolder);
-router.get('/getStackHolderByPPPId', StackHoderController.getStackHolderByPPPId);
+router.get('/getStackHolderByPPPId/:pppId', StackHoderController.getStackHolderByPPPId);
 
 
 
