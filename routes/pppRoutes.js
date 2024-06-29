@@ -12,7 +12,7 @@ router.post('/:id/addImage', pppController.addimage);
 router.post('/:id/addVideo', pppController.addvideo);
 router.get('/:id/getImage', pppController.getimage);
 router.get('/:id/getVideo', pppController.getvideo);
-router.get('/:id/addPdf', pppController.addpdf);
+router.post('/:id/addPdf', pppController.addpdf);
 router.get('/:id/getPdf', pppController.getpdf);
 router.get('/', pppController.getAllPPP);
 router.get('/:id', pppController.getPPPById);
@@ -32,10 +32,6 @@ router.get('/:id/investment-opportunities/:opportunityId', pppController.getInve
 router.put('/:id/investment-opportunities/:opportunityId', pppController.updateInvestmentOpportunity);
 router.delete('/:id/investment-opportunities/:opportunityId', pppController.deleteInvestmentOpportunity);
 
-router.get('/:id/addImage', pppController.addimage);
-router.get('/:id/investment-opportunities/:opportunityId', pppController.getInvestmentOpportunityById);
-router.put('/:id/investment-opportunities/:opportunityId', pppController.updateInvestmentOpportunity);
-router.delete('/:id/investment-opportunities/:opportunityId', pppController.deleteInvestmentOpportunity);
 
 
 
