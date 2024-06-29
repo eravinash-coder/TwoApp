@@ -12,6 +12,8 @@ router.post('/:id/addImage', pppController.addimage);
 router.post('/:id/addVideo', pppController.addvideo);
 router.get('/:id/getImage', pppController.getimage);
 router.get('/:id/getVideo', pppController.getvideo);
+router.get('/:id/addPdf', pppController.addpdf);
+router.get('/:id/getPdf', pppController.getpdf);
 router.get('/', pppController.getAllPPP);
 router.get('/:id', pppController.getPPPById);
 router.put('/:id',pppController.editPPP);

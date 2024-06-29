@@ -13,7 +13,7 @@ const handleUploadpdf = require('../helpers/uploadPdf')
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const myUploadMiddleware = upload.fields([
-  { name: 'pdf', maxCount: 10 },
+  { name: 'image', maxCount: 10 },
 ]);
 
 
@@ -461,7 +461,22 @@ exports.addpdf = asyncHandler(async (req, res) => {
     console.log(error.message);
   }
 });
+exports.getpdf = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const ppp = await PPP.findById(id);
+    if (!ppp) {
+      return res.status(404).json({ error: 'PPP not found' });
+    }
+    res.status(200).json({
+      success: true,
+      data: ppp.resorcepdf,
+    });
 
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 // Get all PPP documents
 exports.getAllPPP = async (req, res) => {
   try {

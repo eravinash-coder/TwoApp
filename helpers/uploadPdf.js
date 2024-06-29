@@ -1,5 +1,4 @@
 const cloudinary = require("cloudinary").v2;
-const stream = require('stream');
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -7,22 +6,17 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 
-function handleUpload(fileBuffer) {
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { resource_type: "auto" },
-      (error, result) => {
-        if (error) {
-          return reject(error);
-        }
-        resolve(result.secure_url);
-      }
-    );
+async function handleUploadpdf(file) {
+  const res = await cloudinary.uploader.upload_stream({
+    resource_type: "auto",
+  }, (error, result) => {
+    if (error) {
+      throw new Error(error.message);
+    }
+    return result.secure_url;
+  }).end(file.buffer);
 
-    const bufferStream = new stream.PassThrough();
-    bufferStream.end(fileBuffer);
-    bufferStream.pipe(uploadStream);
-  });
+  return res.secure_url;
 }
 
-module.exports = handleUpload;
+module.exports = handleUploadpdf;
