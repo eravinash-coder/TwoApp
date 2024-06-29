@@ -26,6 +26,7 @@ function runMiddleware(req, res, fn) {
 
 // Register a new user
 exports.addStackHolder = asyncHandler(async (req, res) => {
+  
   try {
     await runMiddleware(req, res, myUploadMiddleware);
     const { pppId, type, fname,lname,cname,website,email,phone,address,City,pincode,description} = req.body;

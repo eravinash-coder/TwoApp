@@ -9,10 +9,11 @@ const secret = 'your_jwt_secret'; // Store this in a secure place
 const multer = require('multer');
 
 const handleUpload = require('../helpers/upload')
+const handleUploadpdf = require('../helpers/uploadPdf')
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const myUploadMiddleware = upload.fields([
-  { name: 'image', maxCount: 10 },
+  { name: 'pdf', maxCount: 10 },
 ]);
 
 
@@ -335,6 +336,131 @@ exports.deleteInvestmentOpportunity = async (req, res) => {
 };
 
 
+exports.addimage = asyncHandler(async (req, res,) => {
+  try {
+    await runMiddleware(req, res,myUploadMiddleware);
+    const { id } = req.params;
+    console.log(req.files);
+    let imageObjects;
+    if (req.files && req.files['image']) {
+      imageObjects = await Promise.all(
+        req.files['image'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
+    }
+    const ppp = await PPP.findById(id);
+    if (!ppp) {
+      return res.status(404).json({ error: 'PPP not found' });
+    }
+    console.log(imageObjects);
+    ppp.resorceimage.push({ image: imageObjects });
+    await ppp.save();
+    res.status(200).json(ppp);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+    console.log(error.message );
+  }
+});
+exports.getimage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const ppp = await PPP.findById(id);
+    if (!ppp) {
+      return res.status(404).json({ error: 'PPP not found' });
+    }
+    res.status(200).json({
+      success: true,
+      data: ppp.resorceimage,
+    });
+
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+exports.addvideo = asyncHandler(async (req, res,) => {
+  try {
+    await runMiddleware(req, res,myUploadMiddleware);
+    const { id } = req.params;
+    let imageObjects;
+    if (req.files && req.files['image']) {
+      imageObjects = await Promise.all(
+        req.files['image'].map(async (file) => {
+          const b64 = Buffer.from(file.buffer).toString('base64');
+          const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+          return handleUpload(dataURI);
+        })
+      );
+    }
+    const ppp = await PPP.findById(id);
+    if (!ppp) {
+      return res.status(404).json({ error: 'PPP not found' });
+    }
+    console.log(imageObjects);
+    ppp.resorcevideo.push({ video: imageObjects });
+    await ppp.save();
+    res.status(200).json(ppp);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+    console.log(error.message );
+  }
+});
+exports.getvideo = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const ppp = await PPP.findById(id);
+    if (!ppp) {
+      return res.status(404).json({ error: 'PPP not found' });
+    }
+    res.status(200).json({
+      success: true,
+      data: ppp.resorcevideo,
+    });
+
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.addpdf = asyncHandler(async (req, res) => {
+  try {
+    await runMiddleware(req, res, myUploadMiddleware);
+    const { id } = req.params;
+    let pdfObjects = [];
+    
+    if (req.files && req.files['pdf']) {
+      pdfObjects = await Promise.all(
+        req.files['pdf'].map(async (file) => {
+          try {
+            const result = await handleUploadpdf(file.buffer);
+            return result;
+          } catch (uploadError) {
+            console.error(`Failed to upload ${file.originalname}:`, uploadError);
+            return null;
+          }
+        })
+      );
+      // Filter out any null results due to upload failures
+      pdfObjects = pdfObjects.filter(url => url !== null);
+    }
+    
+    console.log(pdfObjects);
+
+    const ppp = await PPP.findById(id);
+    if (!ppp) {
+      return res.status(404).json({ error: 'PPP not found' });
+    }
+
+    ppp.resorcepdf.push({ pdf: pdfObjects });
+    await ppp.save();
+    res.status(200).json(ppp);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+    console.log(error.message);
+  }
+});
 
 // Get all PPP documents
 exports.getAllPPP = async (req, res) => {

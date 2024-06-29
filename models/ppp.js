@@ -14,6 +14,20 @@ const InvestmentOpportunitySchema = new mongoose.Schema({
   opportunityDetails: { type: String, required: true }
 });
 
+const videoSchema = new mongoose.Schema({
+ 
+  video: [Object],
+});
+const pdfSchema = new mongoose.Schema({
+ 
+  pdf: [Object],
+});
+const imageSchema = new mongoose.Schema({
+ 
+  image: [Object],
+  
+});
+
 // Define the main schema
 const PPPSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -22,7 +36,10 @@ const PPPSchema = new mongoose.Schema({
   type: { type: String, required: true },
   image: [Object],
   tourismpolicy: [PolicySchema],
-  investmentOpportunity: [InvestmentOpportunitySchema]
+  investmentOpportunity: [InvestmentOpportunitySchema],
+  resorcevideo:[videoSchema],
+  resorcepdf:[pdfSchema],
+  resorceimage:[imageSchema]
 });
 
 // Hash the password before saving
