@@ -4,7 +4,7 @@ const Cab = require('../models/cabBookingModel');
 exports.getAllCabs = async (req, res) => {
   try {
     const cabs = await Cab.find({ isBooked: false });
-    res.json(cabs);
+    res.status(200).json({success: true, data: cabs});
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
