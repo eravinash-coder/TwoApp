@@ -50,6 +50,7 @@ const ChatRoute = require('./routes/ChatRoute');
 const MessageRoute = require('./routes/MessageRoute');
 
 const pppRoutes = require('./routes/pppRoutes');
+const cabBookingRoutes = require('./routes/cabBookingRoutes');
 
 
 
@@ -107,6 +108,7 @@ app.use('/api/message', MessageRoute);
 app.use('/api/ppp', pppRoutes);
 app.use('/api', appointmentRoutes);
 app.use('/api/StackHolder', StackHolderRoutes);
+app.use('/api/CabBooking', cabBookingRoutes);
 
 app.get('*', function (req, res) {
   res.status(404).json({
