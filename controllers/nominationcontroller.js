@@ -2,6 +2,7 @@
 
 const PrivateNomination = require('../models/privateNomination');
 const GovernmentNomination = require('../models/governmentNomination');
+const Vote = require('../models/voteModal');
 const asyncHandler = require("express-async-handler");
 const multer = require('multer');
 
@@ -92,4 +93,29 @@ exports.submitGovernmentNomination = async (req, res) => {
         console.error(err);
         res.status(500).json({ message: 'Failed to submit government nomination.' });
     }
+};
+exports.submitVote = async (req, res) => {
+   
+  try {
+      await runMiddleware(req, res,myUploadMiddleware);
+      const {
+          name,
+          email,
+          phone,
+          airport
+      } = req.body;
+
+      const vote = new Vote({
+        name,
+        email,
+        phone,
+        airport
+      });
+
+      await vote.save();
+      res.status(200).json({ message: 'Government nomination submitted successfully.' });
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Failed to submit government nomination.' });
+  }
 };

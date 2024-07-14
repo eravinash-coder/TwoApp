@@ -8,5 +8,7 @@ router.post('/private', nominationController.submitPrivateNomination);
 
 // Government nominations route
 router.post('/government', nominationController.submitGovernmentNomination);
+router.post('/submitVote', nominationController.submitVote);
+
 
 module.exports = router;
