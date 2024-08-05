@@ -144,7 +144,10 @@ exports.updateGlobalGallery = async (req, res) => {
 exports.deleteGlobalGallery = async (req, res) => {
   try {
     await GlobalGallery.findByIdAndDelete(req.params.id);
-    res.status(204).json();
+    res.status(201).json({
+        success: true,
+        msg: 'Successfully Deleted'
+    });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
