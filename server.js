@@ -52,6 +52,7 @@ const MessageRoute = require('./routes/MessageRoute');
 const pppRoutes = require('./routes/pppRoutes');
 const cabBookingRoutes = require('./routes/cabBookingRoutes');
 const nominationRoutes = require('./routes/nominationroutes');
+const globalGalleryRoutes = require('./routes/globalGalleryRoutes');
 
 
 
@@ -111,6 +112,8 @@ app.use('/api', appointmentRoutes);
 app.use('/api/StackHolder', StackHolderRoutes);
 app.use('/api/CabBooking', cabBookingRoutes);
 app.use('/api/nominations', nominationRoutes);
+app.use('/api/nominations', nominationRoutes);
+app.use('/api/globalGallery', globalGalleryRoutes);
 
 app.get('*', function (req, res) {
   res.status(404).json({
